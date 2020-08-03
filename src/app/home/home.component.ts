@@ -21,7 +21,7 @@ export class HomeComponent implements OnInit {
 
     ngOnInit(): void {
         this.isLoading = true;
-        this.scoreSerivce.getScores().subscribe((loadedScores) => {
+        this.scoreSerivce.list({}).subscribe((loadedScores) => {
             loadedScores.forEach((scoreObject) => {
                 this.scores.unshift(scoreObject);
             });
