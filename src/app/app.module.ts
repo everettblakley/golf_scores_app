@@ -15,4 +15,4 @@ import { AppComponent } from "./app.component";
     declarations: [AppComponent],
     schemas: [NO_ERRORS_SCHEMA],
 })
-export class AppModule {}
+export class AppModule { }

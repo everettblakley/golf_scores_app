@@ -1,3 +1,36 @@
 .header-text {
   font-size: 18;
 }
+
+.main {
+  padding: 16;
+}
+
+.user-name {
+  font-size: 24;
+}
+
+.profile-picture {
+  background-color: white;
+  border-radius: 50%;
+  border-width: 2;
+  border-color: #08a045;
+}
+
+.user-info {
+  padding: 16;
+}
+
+.profile-link {
+  text-decoration: underline;
+  font-size: 12;
+  font-style: italic;
+}
+
+.handicap-text {
+  font-size: 16;
+}
+
+.picker {
+  margin-left: auto;
+}

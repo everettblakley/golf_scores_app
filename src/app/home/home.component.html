@@ -5,6 +5,25 @@
     </FlexboxLayout>
 </ActionBar>
 
-<GridLayout>
-    <Label [text]="production"></Label>
-</GridLayout>
+<StackLayout class="main">
+    <!-- Profile section -->
+    <GridLayout class="profile-section" columns="auto, *" rows="auto">
+        <GridLayout columns="100" rows="100" col="0" row="0" verticalAlignment="center">
+            <Image class="profile-picture" src="res://defaultprofile" stretch="aspectFill" col="0" row="0">
+            </Image>
+        </GridLayout>
+        <FlexboxLayout class="user-info" col="1" row="0" flexDirection="column" justifyContent="center">
+            <Label class="h3" text="Name"></Label>
+            <Label class="h6" text="Handicap"></Label>
+            <Label class="font-italic" text="Link to profile"></Label>
+        </FlexboxLayout>
+    </GridLayout>
+
+    <!-- History section -->
+    <GridLayout columns="auto, *" rows="auto, *">
+        <FlexboxLayout row="0" alignContent="space-between" alignItems="stretch" width="200">
+            <Label class="h2" text="History"></Label>
+            <!-- <ListPicker flexGrow="1" [items]="sortOptions" class="picker pull-right"></ListPicker> -->
+        </FlexboxLayout>
+    </GridLayout>
+</StackLayout>

@@ -13,6 +13,7 @@ export class HomeComponent implements OnInit {
     public scores: Score[] = [];
     public isLoading: boolean = false;
     public production: string = "";
+    public sortOptions = ["Date (ascending)", "Date (descending)", "Highest first", "Lowest first"];
 
     constructor(private scoreSerivce: ScoreService) {
         // Use the component constructor to inject providers.
@@ -20,13 +21,13 @@ export class HomeComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.isLoading = true;
-        this.scoreSerivce.list({}).subscribe((loadedScores) => {
-            loadedScores.forEach((scoreObject) => {
-                this.scores.unshift(scoreObject);
-            });
-            this.isLoading = false;
-            console.dir(this.scores);
-        });
+        // this.isLoading = true;
+        // this.scoreSerivce.list({}).subscribe((loadedScores) => {
+        //     loadedScores.forEach((scoreObject) => {
+        //         this.scores.unshift(scoreObject);
+        //     });
+        //     this.isLoading = false;
+        //     console.dir(this.scores);
+        // });
     }
 }

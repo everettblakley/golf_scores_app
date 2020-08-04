@@ -23,6 +23,7 @@
     "@nativescript/theme": "~2.3.0",
     "nativescript-angular": "~8.21.0",
     "nativescript-cognito": "^1.1.3-alpha",
+    "nativescript-ngx-fonticon": "^7.0.0",
     "reflect-metadata": "~0.1.12",
     "rxjs": "^6.4.0",
     "tns-core-modules": "~6.5.0",
