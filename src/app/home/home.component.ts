@@ -20,6 +20,10 @@ export class HomeComponent implements OnInit {
         this.production = environment.production ? "production" : "dev";
     }
 
+    dosomething() {
+        alert("To be implemented: Navigate to profile");
+    }
+
     ngOnInit(): void {
         // this.isLoading = true;
         // this.scoreSerivce.list({}).subscribe((loadedScores) => {

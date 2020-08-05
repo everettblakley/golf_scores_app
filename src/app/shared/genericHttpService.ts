@@ -128,7 +128,7 @@ export class ResourceService<T extends Resource> {
      * @returns {T[]}
      * @memberof ResourceService
      */
-    private convertData(data: any): T[] {
+    protected convertData(data: any): T[] {
         return data.map((item: any) => this.serializer.fromJson(item));
     }
 
@@ -140,7 +140,7 @@ export class ResourceService<T extends Resource> {
      * @returns {string}
      * @memberof ResourceService
      */
-    private toQueryString(paramsObject: any): string {
+    protected toQueryString(paramsObject: any): string {
         return Object.keys(paramsObject)
             .map(
                 (key) =>
@@ -173,7 +173,7 @@ export class ResourceService<T extends Resource> {
      * @returns
      * @memberof ResourceService
      */
-    private handleErrors(error: HttpErrorResponse) {
+    protected handleErrors(error: HttpErrorResponse) {
         console.log(error);
         return throwError(error);
     }

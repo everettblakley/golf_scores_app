@@ -1,0 +1,19 @@
+<ScrollView>
+  <FlexboxLayout class="page" flexDirection="column" justifyContent="center" alignItems="center">
+    <StackLayout class="form" #container>
+      <Image class="logo m-t-10" src="res://ballicon" height="100" width="100" stretch="aspectFill"></Image>
+      <Label class="h3" text="golf handicap"></Label>
+
+
+      <RadDataForm *ngIf="isLoggingIn" #loginForm tkToggleNavButton [source]="user" [metadata]="loginFormMetadata">
+      </RadDataForm>
+      <RadDataForm *ngIf="!isLoggingIn" #loginForm tkToggleNavButton [source]="user" [metadata]="signupFormMetadata"
+        (propertyValidate)="dfPropertyValidate($event)">
+      </RadDataForm>
+
+      <Button [text]="isLoggingIn ? 'Log In' : 'Sign Up'" class="btn btn-primary" (tap)="submit()"></Button>
+      <Label class="h6 m-t-20" textDecoration="underline"
+        [text]="isLoggingIn ? 'Don\'t have an account? Sign up' : 'Return to Login'" (tap)="toggleForm()"></Label>
+    </StackLayout>
+  </FlexboxLayout>
+</ScrollView>
