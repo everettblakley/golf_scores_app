@@ -3,13 +3,11 @@ import { User, UserSerializer } from "./user";
 import { ResourceService } from "../genericHttpService";
 import { HttpClient } from "@angular/common/http";
 import { environment } from "~/environments/environment.dev";
-import { Cognito } from "nativescript-cognito"
 
 @Injectable({
   providedIn: "root"
 })
 export class UserService extends ResourceService<User> {
-  // private cognito: Cognito;
 
   constructor(httpClient: HttpClient) {
     super(
@@ -18,7 +16,7 @@ export class UserService extends ResourceService<User> {
       "user",
       new UserSerializer()
     );
-    // this.cognito = new Cognito(environment.userPoolId, environment.clientId);
+    console.dir(environment);
   }
 
   public login(user: User) {
