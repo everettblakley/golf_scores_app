@@ -1,50 +1,46 @@
-import { Injectable } from "@angular/core";
-import { User, UserSerializer } from "./user";
-import { ResourceService } from "../genericHttpService";
-import { HttpClient } from "@angular/common/http";
-import { environment } from "~/environments/environment.dev";
+import { Injectable, NgZone } from "@angular/core";
+import { User } from "./user";
+import * as firebase from "nativescript-plugin-firebase";
 
-@Injectable({
-  providedIn: "root"
-})
-export class UserService extends ResourceService<User> {
+@Injectable()
+export class UserService {
 
-  constructor(httpClient: HttpClient) {
-    super(
-      httpClient,
-      environment.apiUrl,
-      "user",
-      new UserSerializer()
-    );
-    console.dir(environment);
+  constructor(ngZone: NgZone) {
+
   }
 
-  public login(user: User) {
-    // return new Promise((resolve, reject) => {
-    //   this.cognito.authenticate(user.email, user.password)
-    //     .then(token => {
-    //       console.log(token);
-    //       resolve();
-    //     })
-    //     .catch(error => {
-    //       this.handleErrors(error);
-    //       reject();
-    //     })
-    // });
+  public register(user: User): Promise<any> {
+    return new Promise((resolve, reject) => {
+      firebase.createUser({
+        email: user.email,
+        password: user.password,
+      }).then(() => {
+        firebase.updateProfile({
+          displayName: user.name
+        }).then((result: any) => {
+          console.dir(result);
+          resolve(JSON.stringify(result));
+        })
+          .catch((error) => reject(error))
+      }, (error: any) =>
+        reject(error))
+    });
   }
 
-  public signUp(user: User) {
-    // return new Promise((resolve, reject) => {
-    //   this.cognito.signUp(user.email, user.password, { name: user.name })
-    //     .then(token => {
-    //       console.log(token);
-    //       // TODO: handle confirm account
-    //       resolve();
-    //     })
-    //     .catch(error => {
-    //       this.handleErrors(error);
-    //       reject();
-    //     })
-    // })
+  public login(user: User): Promise<any> {
+    return new Promise((resolve, reject) => {
+      firebase.login({
+        type: firebase.LoginType.PASSWORD,
+        passwordOptions: {
+          email: user.email,
+          password: user.password
+        }
+      }).then((result: any) => {
+        console.dir(result);
+        resolve(JSON.stringify(result));
+      }, (error: any) => {
+        reject(error);
+      });
+    });
   }
 }

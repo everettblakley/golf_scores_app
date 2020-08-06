@@ -4,16 +4,22 @@
       <Image class="logo m-t-10" src="res://ballicon" height="100" width="100" stretch="aspectFill"></Image>
       <Label class="h3" text="golf handicap"></Label>
 
+      <GridLayout rows="auto, auto, auto, auto">
+        <RadDataForm row="1" *ngIf="isLoggingIn" [isReadOnly]="isLoading" #loginForm tkToggleNavButton [source]="user"
+          [metadata]="loginFormMetadata">
+        </RadDataForm>
+        <RadDataForm row="1" *ngIf="!isLoggingIn" [isReadOnly]="isLoading" #loginForm tkToggleNavButton [source]="user"
+          [metadata]="signupFormMetadata" (propertyValidate)="dfPropertyValidate($event)">
+        </RadDataForm>
 
-      <RadDataForm *ngIf="isLoggingIn" #loginForm tkToggleNavButton [source]="user" [metadata]="loginFormMetadata">
-      </RadDataForm>
-      <RadDataForm *ngIf="!isLoggingIn" #loginForm tkToggleNavButton [source]="user" [metadata]="signupFormMetadata"
-        (propertyValidate)="dfPropertyValidate($event)">
-      </RadDataForm>
+        <Button row="2" [isEnabled]="!isLoading" [text]="isLoggingIn ? 'Log In' : 'Sign Up'" class="btn btn-primary"
+          (tap)="submit()">
+        </Button>
+        <Label row="3" class="h6 m-t-20" textDecoration="underline" [isEnabled]="!isLoading"
+          [text]="isLoggingIn ? 'Don\'t have an account? Sign up' : 'Return to Login'" (tap)="toggleForm()"></Label>
 
-      <Button [text]="isLoggingIn ? 'Log In' : 'Sign Up'" class="btn btn-primary" (tap)="submit()"></Button>
-      <Label class="h6 m-t-20" textDecoration="underline"
-        [text]="isLoggingIn ? 'Don\'t have an account? Sign up' : 'Return to Login'" (tap)="toggleForm()"></Label>
+        <ActivityIndicator rowSpan="4" [busy]="isLoading"></ActivityIndicator>
+      </GridLayout>
     </StackLayout>
   </FlexboxLayout>
 </ScrollView>

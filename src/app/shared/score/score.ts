@@ -1,10 +1,11 @@
 import { Resource, Serializer } from "../genericHttpService";
+import * as moment from "moment";
 
 export class Score extends Resource {
     public course: string;
     public grossScore: number;
-    public createdAt: string;
-    public scoreDate: string;
+    public createdAt: moment.Moment;
+    public scoreDate: moment.Moment;
     public slope: number;
     public rating: number;
     public conditions: string;
@@ -18,8 +19,8 @@ export class ScoreSerializer implements Serializer {
         const score = new Score();
         score.id = json.id;
         score.course = json.course;
-        score.createdAt = json.createdAt;
-        score.scoreDate = json.scoreDate;
+        score.createdAt = moment(json.createdAt);
+        score.scoreDate = moment(json.scoreDate);
         score.slope = json.slope;
         score.rating = json.rating;
         score.conditions = json.conditions;
@@ -32,8 +33,8 @@ export class ScoreSerializer implements Serializer {
         return {
             id: resource.id,
             course: resource.course,
-            createdAt: resource.createdAt,
-            scoreDate: resource.scoreDate,
+            createdAt: resource.createdAt.toLocaleString(),
+            scoreDate: resource.scoreDate.toLocaleString(),
             slope: resource.slope,
             rating: resource.rating,
             conditions: resource.conditions,

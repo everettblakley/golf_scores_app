@@ -1,7 +1,9 @@
 import { HttpClient, HttpHeaders, HttpErrorResponse } from "@angular/common/http";
 import { Observable } from "rxjs/internal/Observable";
+import { from } from "rxjs";
 import { map, catchError } from "rxjs/operators";
 import { throwError } from "rxjs";
+import * as firebase from "nativescript-plugin-firebase/app";
 
 /**
  * Base resource type
@@ -10,7 +12,7 @@ import { throwError } from "rxjs";
  * @class Resource
  */
 export class Resource {
-    id: number;
+    id: string;
 }
 
 /**
@@ -25,22 +27,16 @@ export interface Serializer {
 }
 
 /**
- * Generic Rest Service for all rest services within the app
+ * Generic Firebase Service for all rest services within the app
  *
  * @export
- * @class ResourceService
+ * @class FirebaseService
  * @template T
  */
-export class ResourceService<T extends Resource> {
+export class FirebaseService<T extends Resource> {
     constructor(
-        // The Injected HttpClient
-        private httpClient: HttpClient,
-
-        // The base api url of the service
-        private url: string,
-
-        // The endpoint of the service
-        private endpoint: string,
+        // The name of the collection in Firebase
+        private collection: string,
 
         // The serializer to convert to/from JSON objects
         private serializer: Serializer
@@ -52,15 +48,17 @@ export class ResourceService<T extends Resource> {
      *
      * @param {T} item
      * @returns {Observable<T>}
-     * @memberof ResourceService
+     * @memberof FirebaseService
      */
-    public create(item: T): Observable<T> {
-        return this.httpClient
-            .post<T>(
-                `${this.url}/${this.endpoint}`,
-                this.serializer.toJson(item)
-            )
-            .pipe(map((data) => this.serializer.fromJson(data) as T), catchError(this.handleErrors));
+    public create(item: T): Observable<any> {
+        return from(
+            firebase.firestore()
+                .collection(this.collection)
+                .add(this.serializer.toJson(item))
+        ).pipe(
+            map((data) => this.serializer.fromJson(data) as T),
+            catchError(this.handleErrors)
+        );
     }
 
     /**
@@ -68,15 +66,18 @@ export class ResourceService<T extends Resource> {
      *
      * @param {T} item
      * @returns {Observable<T>}
-     * @memberof ResourceService
+     * @memberof FirebaseService
      */
     public update(item: T): Observable<T> {
-        return this.httpClient
-            .put<T>(
-                `${this.url}/${this.endpoint}/${item.id}`,
-                this.serializer.toJson(item)
-            )
-            .pipe(map((data) => this.serializer.fromJson(data) as T), catchError(this.handleErrors));
+        return from(
+            firebase.firestore()
+                .collection(this.collection)
+                .doc(item.id)
+                .update(this.serializer.toJson(item))
+        ).pipe(
+            map((data) => this.serializer.fromJson(data) as T),
+            catchError(this.handleErrors)
+        );
     }
 
     /**
@@ -84,12 +85,19 @@ export class ResourceService<T extends Resource> {
      *
      * @param {number} id
      * @returns {Observable<T>}
-     * @memberof ResourceService
+     * @memberof FirebaseService
      */
-    public read(id: number): Observable<T> {
-        return this.httpClient
-            .get(`${this.url}/${this.endpoint}/${id}`)
-            .pipe(map((data: any) => this.serializer.fromJson(data) as T), catchError(this.handleErrors));
+    public read(id: string): Observable<T> {
+        return from(
+            firebase.firestore()
+                .collection(this.collection)
+                .doc(id)
+                .get({ source: "server" })
+                .then((doc) => ({ id: doc.id, ...doc.data() }))
+        ).pipe(
+            map((data: any) => this.serializer.fromJson(data) as T),
+            catchError(this.handleErrors)
+        );
     }
 
     /**
@@ -97,16 +105,22 @@ export class ResourceService<T extends Resource> {
      *
      * @param {*} queryOptions Any filtering or querying options you wish to provide
      * @returns {Observable<T[]>}
-     * @memberof ResourceService
+     * @memberof FirebaseService
      */
     public list(queryOptions: any): Observable<T[]> {
-        return this.httpClient
-            .get(
-                `${this.url}/${this.endpoint}?${this.toQueryString(
-                    queryOptions
-                )}`
-            )
-            .pipe(map((data: any) => this.convertData(data.items)), catchError(this.handleErrors));
+        return from(
+            firebase.firestore()
+                .collection(this.collection)
+                .get(queryOptions)
+                .then((snapshot) => {
+                    let result = []
+                    snapshot.forEach(doc => result.push({ id: doc.id, ...doc.data() }))
+                    return result;
+                })
+        ).pipe(
+            map((data: any) => this.convertData(data)),
+            catchError(this.handleErrors)
+        );
     }
 
     /**
@@ -114,10 +128,13 @@ export class ResourceService<T extends Resource> {
      *
      * @param {number} id
      * @returns
-     * @memberof ResourceService
+     * @memberof FirebaseService
      */
-    public delete(id: number) {
-        return this.httpClient.delete(`${this.url}/${this.endpoint}/${id}`);
+    public delete(id: string) {
+        return firebase.firestore()
+            .collection(this.collection)
+            .doc(id)
+            .delete()
     }
 
     /**
@@ -126,7 +143,7 @@ export class ResourceService<T extends Resource> {
      * @private
      * @param {*} data
      * @returns {T[]}
-     * @memberof ResourceService
+     * @memberof FirebaseService
      */
     protected convertData(data: any): T[] {
         return data.map((item: any) => this.serializer.fromJson(item));
@@ -138,7 +155,7 @@ export class ResourceService<T extends Resource> {
      * @private
      * @param {*} paramsObject
      * @returns {string}
-     * @memberof ResourceService
+     * @memberof FirebaseService
      */
     protected toQueryString(paramsObject: any): string {
         return Object.keys(paramsObject)
@@ -156,7 +173,7 @@ export class ResourceService<T extends Resource> {
      *
      * @protected
      * @returns
-     * @memberof ResourceService
+     * @memberof FirebaseService
      */
     protected getCommonHeaders() {
         return new HttpHeaders({
@@ -171,7 +188,7 @@ export class ResourceService<T extends Resource> {
      * @private
      * @param {HttpErrorResponse} error
      * @returns
-     * @memberof ResourceService
+     * @memberof FirebaseService
      */
     protected handleErrors(error: HttpErrorResponse) {
         console.log(error);

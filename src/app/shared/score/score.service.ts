@@ -1,19 +1,19 @@
-import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { environment } from "~/environments/environment.dev";
-import { ResourceService } from "../genericHttpService";
+import { FirebaseService } from "../genericHttpService";
 import { Score, ScoreSerializer } from "./score";
+import * as moment from "moment";
+
 
 @Injectable({
     providedIn: "root",
 })
-export class ScoreService extends ResourceService<Score> {
+export class ScoreService extends FirebaseService<Score> {
     private scores = new Array<Score>({
-        id: 1,
+        id: "test_id",
         course: "Land O Lakes",
         grossScore: 88,
-        createdAt: "",
-        scoreDate: "",
+        createdAt: moment(),
+        scoreDate: moment(),
         slope: 124,
         rating: 69.9,
         conditions: "Sunny",
@@ -21,10 +21,8 @@ export class ScoreService extends ResourceService<Score> {
         holes: 18,
     });
 
-    constructor(httpClient: HttpClient) {
+    constructor() {
         super(
-            httpClient,
-            environment.apiUrl,
             "scores",
             new ScoreSerializer()
         )

@@ -1,8 +1,13 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
-import { Page, View } from 'tns-core-modules/ui/page';
-import { UserService } from '../shared/user/user.service';
+import { Component, OnInit } from '@angular/core';
+import { RouterExtensions } from 'nativescript-angular/router';
+import * as ApplicationSettings from "tns-core-modules/application-settings";
+import { Page } from 'tns-core-modules/ui/page';
+import * as dialogs from "tns-core-modules/ui/dialogs";
 import { User } from '../shared/user/user';
-import { RadDataForm } from 'nativescript-ui-dataform';
+import { UserService } from '../shared/user/user.service';
+
+import * as loginForm from "./loginForm.json";
+import * as signupForm from "./signUpForm.json";
 
 @Component({
   selector: 'ns-login',
@@ -12,10 +17,18 @@ import { RadDataForm } from 'nativescript-ui-dataform';
 export class LoginComponent implements OnInit {
   public isLoggingIn: boolean = true;
   public user: User;
+  public isLoading: boolean = false;
 
-  constructor(private page: Page, private userService: UserService) {
+  constructor(private page: Page, private userService: UserService, private router: RouterExtensions) {
     page.actionBarHidden = true;
     page.backgroundImage = "~/app/images/golf_course.jpg";
+  }
+
+  ngOnInit() {
+    if (ApplicationSettings.getBoolean("authenticated", false)) {
+      this.router.navigate(["/home"], { clearHistory: true });
+    };
+    this.user = new User("e@b.com", "Password1!", "", "");
   }
 
   toggleForm() {
@@ -23,17 +36,53 @@ export class LoginComponent implements OnInit {
   }
 
   submit() {
-    console.dir(this.user);
+    this.isLoading = true;
+
+    if (this.isLoggingIn) {
+      this.userService.login(this.user)
+        .then((result: any) => {
+
+          this.isLoading = false;
+
+          ApplicationSettings.setBoolean("authenticated", true);
+          console.dir(result);
+          this.router.navigate(["/home"], { clearHistory: true });
+        })
+        .catch((error) => {
+          this.isLoading = false;
+          dialogs.alert({
+            title: "An error occurred",
+            message: `${error}`,
+            okButtonText: "Close"
+          })
+        }
+        );
+    } else {
+      this.userService.register(this.user)
+        .then(() => {
+          this.isLoading = false;
+          dialogs.alert({
+            title: "Sign-up successful!",
+            message: "Please login with your newly created account",
+            okButtonText: "Ok"
+          }).then(() => this.isLoggingIn = true);
+        })
+        .catch((error) => {
+          this.isLoading = false;
+          dialogs.alert({
+            title: "An error occurred",
+            message: `${error}`,
+            okButtonText: "Close"
+          });
+        }
+        );
+    }
   }
 
   public isFormValid(): boolean {
     let valid = false;
 
     return valid;
-  }
-
-  ngOnInit() {
-    this.user = new User("", "", "", "");
   }
 
   dfPropertyValidate(args: any) {
@@ -56,99 +105,97 @@ export class LoginComponent implements OnInit {
     "isReadOnly": false,
     "commitMode": "Immediate",
     "validationMode": "Immediate",
-    "propertyAnnotations":
-      [
-        {
-          "name": "name",
-          "displayName": "Name",
-          "index": 0,
-          "required": false,
-          "ignore": true
-        },
-        {
-          "name": "email",
-          "displayName": "Email",
-          "index": 1,
-          "editor": "Email",
-          "required": true,
-          "validators": [
-            {
-              "name": "Email",
-              "params": {
-                "errorMessage": "Invalid email address"
-              }
+    "propertyAnnotations": [
+      {
+        "name": "name",
+        "displayName": "Name",
+        "index": 0,
+        "required": false,
+        "ignore": true
+      },
+      {
+        "name": "email",
+        "displayName": "Email",
+        "index": 1,
+        "editor": "Email",
+        "required": true,
+        "validators": [
+          {
+            "name": "Email",
+            "params": {
+              "errorMessage": "Invalid email address"
             }
-          ]
-        },
-        {
-          "name": "password",
-          "displayName": "Password",
-          "index": 2,
-          "editor": "Password",
-          "required": true,
-        },
-        {
-          "name": "confirmPassword",
-          "displayName": "Confirm Password",
-          "index": 3,
-          "editor": "Password",
-          "ignore": true,
-          "required": false
-        }
-      ]
+          }
+        ]
+      },
+      {
+        "name": "password",
+        "displayName": "Password",
+        "index": 2,
+        "editor": "Password",
+        "required": true
+      },
+      {
+        "name": "confirmPassword",
+        "displayName": "Confirm Password",
+        "index": 3,
+        "editor": "Password",
+        "ignore": true,
+        "required": false
+      }
+    ]
   }
 
   signupFormMetadata = {
     "isReadOnly": false,
     "commitMode": "Immediate",
     "validationMode": "Immediate",
-    "propertyAnnotations":
-      [
-        {
-          "name": "name",
-          "displayName": "Name",
-          "index": 0,
-          "required": true
-        },
-        {
-          "name": "email",
-          "displayName": "Email",
-          "index": 1,
-          "editor": "Email",
-          "required": true,
-          "validators": [
-            {
-              "name": "Email",
-              "params": {
-                "errorMessage": "Invalid email address"
-              }
+    "propertyAnnotations": [
+      {
+        "name": "name",
+        "displayName": "Name",
+        "index": 0,
+        "required": true
+      },
+      {
+        "name": "email",
+        "displayName": "Email",
+        "index": 1,
+        "editor": "Email",
+        "required": true,
+        "validators": [
+          {
+            "name": "Email",
+            "params": {
+              "errorMessage": "Invalid email address"
             }
-          ]
-        },
-        {
-          "name": "password",
-          "displayName": "Password",
-          "index": 2,
-          "editor": "Password",
-          "required": true,
-          "validators": [
-            {
-              "name": "RegEx",
-              "params": {
-                "regEx": "^(?=.{10,}$)(?=.*?[a-z])(?=.*?[A-Z])(?=.*?[0-9]).*$",
-                "errorMessage": "Password must have at least 8 characters, at least one lowercase letter, at least one uppercase letter, and at least one number"
-              }
+          }
+        ]
+      },
+      {
+        "name": "password",
+        "displayName": "Password",
+        "index": 2,
+        "editor": "Password",
+        "required": true,
+        "validators": [
+          {
+            "name": "RegEx",
+            "params": {
+              "regEx": "^(?=.{10,}$)(?=.*?[a-z])(?=.*?[A-Z])(?=.*?[0-9]).*$",
+              "errorMessage": "Password must have at least 8 characters, at least one lowercase letter, at least one uppercase letter, and at least one number"
             }
-          ]
-        },
-        {
-          "name": "confirmPassword",
-          "displayName": "Confirm Password",
-          "index": 3,
-          "editor": "Password",
-          "required": true,
-        }
-      ]
+          }
+        ]
+      },
+      {
+        "name": "confirmPassword",
+        "displayName": "Confirm Password",
+        "index": 3,
+        "editor": "Password",
+        "required": true
+      }
+    ]
   }
 
 

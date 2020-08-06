@@ -1,0 +1,51 @@
+{
+  "isReadOnly": false,
+  "commitMode": "Immediate",
+  "validationMode": "Immediate",
+  "propertyAnnotations": [
+    {
+      "name": "name",
+      "displayName": "Name",
+      "index": 0,
+      "required": true
+    },
+    {
+      "name": "email",
+      "displayName": "Email",
+      "index": 1,
+      "editor": "Email",
+      "required": true,
+      "validators": [
+        {
+          "name": "Email",
+          "params": {
+            "errorMessage": "Invalid email address"
+          }
+        }
+      ]
+    },
+    {
+      "name": "password",
+      "displayName": "Password",
+      "index": 2,
+      "editor": "Password",
+      "required": true,
+      "validators": [
+        {
+          "name": "RegEx",
+          "params": {
+            "regEx": "^(?=.{10,}$)(?=.*?[a-z])(?=.*?[A-Z])(?=.*?[0-9]).*$",
+            "errorMessage": "Password must have at least 8 characters, at least one lowercase letter, at least one uppercase letter, and at least one number"
+          }
+        }
+      ]
+    },
+    {
+      "name": "confirmPassword",
+      "displayName": "Confirm Password",
+      "index": 3,
+      "editor": "Password",
+      "required": true
+    }
+  ]
+}

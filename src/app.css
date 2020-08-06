@@ -14,3 +14,7 @@ This is where the vast majority of your CSS code goes. */
 .bg-blue {
   background-color: blue;
 }
+
+:disabled {
+  opacity: 0.5;
+}
