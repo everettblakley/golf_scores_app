@@ -11,8 +11,8 @@ export class User extends Resource {
   constructor(email: string, password: string, name?: string, confirmPassword?: string) {
     super();
     this.email = email;
-    this.password = password;
     this.name = name;
+    this.password = password;
     this.confirmPassword = confirmPassword;
   }
 
@@ -21,13 +21,14 @@ export class User extends Resource {
   }
 }
 
+
 export class UserSerializer implements Serializer {
   fromJson(json: any): User {
     const user = new User("", "");
     user.id = json.id;
     user.name = json.name;
     user.email = json.email;
-    user.password = "";
+    user.password = ""
     return user;
   }
   toJson(resource: User) {

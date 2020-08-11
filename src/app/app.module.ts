@@ -2,7 +2,7 @@ import { NgModule, NO_ERRORS_SCHEMA } from "@angular/core";
 import { NativeScriptModule } from "nativescript-angular/nativescript.module";
 import { NativeScriptHttpClientModule } from "nativescript-angular/http-client";
 import { NativeScriptUIDataFormModule } from "nativescript-ui-dataform/angular";
-import { NativeScriptUIAutoCompleteTextViewModule } from "nativescript-ui-autocomplete/angular";
+import { NativeScriptUIListViewModule } from "nativescript-ui-listview/angular";
 
 import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
@@ -15,7 +15,7 @@ import { UserService } from "./shared/user/user.service";
         NativeScriptModule,
         NativeScriptHttpClientModule,
         NativeScriptUIDataFormModule,
-        NativeScriptUIAutoCompleteTextViewModule,
+        NativeScriptUIListViewModule,
         AppRoutingModule,
     ],
     declarations: [AppComponent, LoginComponent],

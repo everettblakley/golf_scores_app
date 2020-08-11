@@ -26,6 +26,7 @@ export class ScoreSerializer implements Serializer {
         score.conditions = json.conditions;
         score.tees = json.tees;
         score.holes = json.holes;
+        score.grossScore = json.grossScore;
 
         return score;
     }
@@ -40,6 +41,7 @@ export class ScoreSerializer implements Serializer {
             conditions: resource.conditions,
             tees: resource.tees,
             holes: resource.holes,
+            grossScore: resource.grossScore
         };
     }
 }

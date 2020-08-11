@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 import { FirebaseService } from "../genericHttpService";
 import { Score, ScoreSerializer } from "./score";
 import * as moment from "moment";
+import { Observable } from "rxjs";
 
 
 @Injectable({

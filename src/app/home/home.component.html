@@ -14,16 +14,30 @@
         </GridLayout>
         <FlexboxLayout class="user-info" col="1" row="0" flexDirection="column" justifyContent="center">
             <Label class="h3" text="Name"></Label>
-            <Label class="h6" text="Handicap"></Label>
-            <Label class="font-italic" textDecoration="underline" text="Link to profile" (tap)="dosomething()"></Label>
+            <Label class="h6" text="Current Handicap"></Label>
+            <Label class="font-italic" textDecoration="underline" text="Click to logout" (tap)="logout()"></Label>
         </FlexboxLayout>
     </GridLayout>
 
     <!-- History section -->
-    <GridLayout columns="auto, *" rows="auto, *">
-        <FlexboxLayout row="0" alignContent="space-between" alignItems="stretch" width="200">
+    <GridLayout columns="*" rows="auto, *, auto">
+        <FlexboxLayout class="score-list__header" row="0" col="0" justifyContent="space-between" alignItems="center">
             <Label class="h2" text="History"></Label>
+            <Label class="h6" text="Sort by: N/A"></Label>
             <!-- <ListPicker flexGrow="1" [items]="sortOptions" class="picker pull-right"></ListPicker> -->
         </FlexboxLayout>
+        <RadListView [items]="scores" row="1" class="w100">
+            <ng-template tkListItemTemplate let-score="item">
+                <GridLayout columns="auto, *" rows="auto" class="score-list__item" shadow="4">
+                    <Label *ngIf="score" class="score-list__item-grossScore" [text]="score.grossScore" col="0"></Label>
+                    <FlexboxLayout *ngIf="score" class="score-list__item-right" flexDirection="column"
+                        justifyContent="flex-end" col="1">
+                        <Label [text]="formatDate(score.scoreDate, 'MMMM Do, YYYY')"></Label>
+                        <Label [text]="score.course"></Label>
+                    </FlexboxLayout>
+                </GridLayout>
+            </ng-template>
+        </RadListView>
+        <ActivityIndicator [busy]="isLoading" rowSpan="3"></ActivityIndicator>
     </GridLayout>
 </StackLayout>

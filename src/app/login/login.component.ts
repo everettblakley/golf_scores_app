@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
+import * as moment from "moment";
 import { RouterExtensions } from 'nativescript-angular/router';
+import { Couchbase } from "nativescript-couchbase-plugin";
 import * as ApplicationSettings from "tns-core-modules/application-settings";
-import { Page } from 'tns-core-modules/ui/page';
 import * as dialogs from "tns-core-modules/ui/dialogs";
+import { EventData, Page } from 'tns-core-modules/ui/page';
+import { Switch } from "tns-core-modules/ui/switch";
+import { environment } from '~/environments/environment.dev';
 import { User } from '../shared/user/user';
 import { UserService } from '../shared/user/user.service';
-
-import * as loginForm from "./loginForm.json";
-import * as signupForm from "./signUpForm.json";
 
 @Component({
   selector: 'ns-login',
@@ -18,6 +19,10 @@ export class LoginComponent implements OnInit {
   public isLoggingIn: boolean = true;
   public user: User;
   public isLoading: boolean = false;
+  public db: Couchbase;
+
+  private lastAuthenticated = "lastAuthenticated"
+  private rememberMeKey = "rememberMe"
 
   constructor(private page: Page, private userService: UserService, private router: RouterExtensions) {
     page.actionBarHidden = true;
@@ -25,38 +30,96 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit() {
-    if (ApplicationSettings.getBoolean("authenticated", false)) {
-      this.router.navigate(["/home"], { clearHistory: true });
-    };
-    this.user = new User("e@b.com", "Password1!", "", "");
+    this.isLoading = true;
+    this.db = new Couchbase(environment.dbName);
+    const userResult = this.getLocalUser();
+    if (userResult != null && ApplicationSettings.hasKey(this.rememberMeKey) && ApplicationSettings.getBoolean(this.rememberMeKey)) {
+      // If there is a user in the local db, set the user to it and log them in
+      this.user = new User(userResult.email, userResult.password || "", userResult.name, "");
+
+      if (ApplicationSettings.hasKey(this.lastAuthenticated)) {
+        const lastAuthenticated = moment(ApplicationSettings.getString(this.lastAuthenticated)).toISOString();
+        if (moment(lastAuthenticated).isBefore(moment().subtract(moment.duration(1, "hours")))) {
+          this.performLogin();
+        } else {
+          this.router.navigate(["/home"], { clearHistory: true });
+        }
+      }
+
+      this.isLoading = false;
+      return;
+    } else {
+      ApplicationSettings.setBoolean(this.rememberMeKey, false);
+      this.user = new User("", "", "", "");
+      this.isLoading = false;
+      return;
+    }
+  }
+
+  get rememberMe() {
+    return ApplicationSettings.getBoolean(this.rememberMeKey);
+  }
+
+  getLocalUser() {
+    return this.db.getDocument(environment.dbUserKey);
   }
 
   toggleForm() {
     this.isLoggingIn = !this.isLoggingIn;
   }
 
+  onCheckedChange(args: EventData) {
+    this.isLoading = true;
+    let sw = args.object as Switch;
+    if (!ApplicationSettings.hasKey(this.rememberMeKey)) {
+      ApplicationSettings.setBoolean(this.rememberMeKey, false);
+    } else {
+      if (sw.checked !== undefined) {
+        ApplicationSettings.setBoolean(this.rememberMeKey, sw.checked);
+      } else {
+        ApplicationSettings.setBoolean(this.rememberMeKey, false);
+      }
+    }
+    this.isLoading = false;
+  }
+
+  performLogin() {
+    this.userService.login(this.user)
+      .then((result: User) => {
+
+        this.isLoading = false;
+
+        ApplicationSettings.setString(this.lastAuthenticated, moment().toISOString());
+
+        const user = this.getLocalUser();
+        if (this.rememberMe) {
+          if (user != null) {
+            this.db.updateDocument(environment.dbUserKey, result);
+          } else {
+            this.db.createDocument(result, environment.dbUserKey);
+          }
+        } else {
+          this.db.deleteDocument(environment.dbUserKey);
+        }
+
+        this.router.navigate(["/home"], { clearHistory: true });
+      })
+      .catch((error) => {
+        this.isLoading = false;
+        dialogs.alert({
+          title: "An error occurred",
+          message: `${error}`,
+          okButtonText: "Close"
+        })
+      }
+      );
+  }
+
   submit() {
     this.isLoading = true;
 
     if (this.isLoggingIn) {
-      this.userService.login(this.user)
-        .then((result: any) => {
-
-          this.isLoading = false;
-
-          ApplicationSettings.setBoolean("authenticated", true);
-          console.dir(result);
-          this.router.navigate(["/home"], { clearHistory: true });
-        })
-        .catch((error) => {
-          this.isLoading = false;
-          dialogs.alert({
-            title: "An error occurred",
-            message: `${error}`,
-            okButtonText: "Close"
-          })
-        }
-        );
+      this.performLogin();
     } else {
       this.userService.register(this.user)
         .then(() => {
