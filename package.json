@@ -21,6 +21,8 @@
     "@angular/platform-browser-dynamic": "~8.2.0",
     "@angular/router": "~8.2.0",
     "@nativescript/theme": "~2.3.0",
+    "@nstudio/nativescript-floatingactionbutton": "^2.1.0",
+    "@types/jest": "^26.0.9",
     "email-validator": "^2.0.4",
     "moment": "^2.27.0",
     "nativescript-angular": "~8.21.0",
@@ -36,7 +38,9 @@
   },
   "devDependencies": {
     "@angular/compiler-cli": "~8.2.0",
+    "@nativescript/schematics": "^10.0.2",
     "@ngtools/webpack": "~8.2.0",
+    "@schematics/angular": "^10.0.5",
     "nativescript-dev-webpack": "~1.5.0",
     "typescript": "~3.5.3"
   },

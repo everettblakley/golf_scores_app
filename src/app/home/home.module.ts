@@ -5,6 +5,8 @@ import { NgShadowModule } from 'nativescript-ng-shadow';
 
 import { HomeRoutingModule } from "./home-routing.module";
 import { HomeComponent } from "./home.component";
+import { ProfileComponent } from './profile/profile.component';
+import { ScoreComponent } from './score/score.component';
 
 
 @NgModule({
@@ -15,7 +17,9 @@ import { HomeComponent } from "./home.component";
         HomeRoutingModule,
     ],
     declarations: [
-        HomeComponent
+        HomeComponent,
+        ProfileComponent,
+        ScoreComponent
     ],
     schemas: [
         NO_ERRORS_SCHEMA

@@ -13,9 +13,9 @@
             </Image>
         </GridLayout>
         <FlexboxLayout class="user-info" col="1" row="0" flexDirection="column" justifyContent="center">
-            <Label class="h3" text="Name"></Label>
+            <Label class="h3" [text]="user.name"></Label>
             <Label class="h6" text="Current Handicap"></Label>
-            <Label class="font-italic" textDecoration="underline" text="Click to logout" (tap)="logout()"></Label>
+            <Label class="font-italic" textDecoration="underline" text="View profile" (tap)="goToProfile()"></Label>
         </FlexboxLayout>
     </GridLayout>
 
@@ -24,11 +24,11 @@
         <FlexboxLayout class="score-list__header" row="0" col="0" justifyContent="space-between" alignItems="center">
             <Label class="h2" text="History"></Label>
             <Label class="h6" text="Sort by: N/A"></Label>
-            <!-- <ListPicker flexGrow="1" [items]="sortOptions" class="picker pull-right"></ListPicker> -->
         </FlexboxLayout>
         <RadListView [items]="scores" row="1" class="w100">
             <ng-template tkListItemTemplate let-score="item">
-                <GridLayout columns="auto, *" rows="auto" class="score-list__item" shadow="4">
+                <GridLayout (tap)="goToScore(score)" (longPress)="onLongPress(score)" columns="auto, *" rows="auto"
+                    class="score-list__item" shadow="4">
                     <Label *ngIf="score" class="score-list__item-grossScore" [text]="score.grossScore" col="0"></Label>
                     <FlexboxLayout *ngIf="score" class="score-list__item-right" flexDirection="column"
                         justifyContent="flex-end" col="1">
@@ -41,3 +41,5 @@
         <ActivityIndicator [busy]="isLoading" rowSpan="3"></ActivityIndicator>
     </GridLayout>
 </StackLayout>
+
+<FAB (tap)="goToScore()" icon="res://plus" rippleColor="#08a045" class="fab-button btn-primary"></FAB>

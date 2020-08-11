@@ -9,6 +9,10 @@ import { AppComponent } from "./app.component";
 import { LoginComponent } from './login/login.component';
 import { UserService } from "./shared/user/user.service";
 
+import { registerElement } from "nativescript-angular/element-registry";
+
+registerElement("Fab", () => require("@nstudio/nativescript-floatingactionbutton").Fab);
+
 @NgModule({
     bootstrap: [AppComponent],
     imports: [

@@ -44,6 +44,19 @@ export class UserService {
     });
   }
 
+  public currentUser(): Promise<User> {
+    return new Promise((resolve, reject) => {
+      firebase.getCurrentUser()
+        .then((userResult: firebase.User) => {
+          const name = userResult.displayName || "No name";
+          const user = new User(userResult.email, "", name, "");
+          resolve(user);
+        })
+        .catch(error => reject(error));
+    })
+  }
+
+
   public logout(): Promise<any> {
     return new Promise((resolve, reject) => {
       firebase.logout()

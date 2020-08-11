@@ -1,4 +1,4 @@
-import { Resource, Serializer } from "../genericHttpService";
+import { Resource, Serializer } from "../genericFirebaseService";
 
 var validator = require("email-validator");
 

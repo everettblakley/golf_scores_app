@@ -1,4 +1,4 @@
-import { Resource, Serializer } from "../genericHttpService";
+import { Resource, Serializer } from "../genericFirebaseService";
 import * as moment from "moment";
 
 export class Score extends Resource {
