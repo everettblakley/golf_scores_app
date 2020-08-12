@@ -28,6 +28,8 @@ export class HomeComponent implements OnInit {
         this.user = new User("", "", "Loading...", "");
     }
 
+    get noScores() { return this.scores.length === 0; }
+
     dosomething() {
         alert("To be implemented: Navigate to profile");
     }
@@ -99,9 +101,19 @@ export class HomeComponent implements OnInit {
 
     loadScores() {
         this.isLoading = true;
-        this.scoreSerivce.listScores().subscribe((loadedScores) => {
-            this.scores = loadedScores;
-            this.isLoading = false;
-        });
+        this.scoreSerivce.list().subscribe(
+            (loadedScores) => {
+                this.scores = loadedScores;
+                this.isLoading = false;
+            },
+            (error) => {
+                dialogs.alert({
+                    title: "An error occurred",
+                    message: "We were unable to retrieve your scores. Please try again later",
+                    okButtonText: "Ok"
+                });
+                this.isLoading = false;
+                console.log(error);
+            });
     }
 }

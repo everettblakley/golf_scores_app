@@ -7,6 +7,8 @@ export class User extends Resource {
   public email: string;
   public password: string;
   public confirmPassword: string;
+  public id: string;
+  public ownerId: string;
 
   constructor(email: string, password: string, name?: string, confirmPassword?: string) {
     super();
@@ -14,6 +16,7 @@ export class User extends Resource {
     this.name = name;
     this.password = password;
     this.confirmPassword = confirmPassword;
+    this.ownerId = undefined;
   }
 
   public isEmailValid(): boolean {

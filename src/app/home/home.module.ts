@@ -8,6 +8,7 @@ import { HomeComponent } from "./home.component";
 import { ProfileComponent } from './profile/profile.component';
 import { ScoreComponent } from './score/score.component';
 import { ScoreService } from "../shared/score/score.service";
+import { UserService } from "../shared/user/user.service";
 
 
 
@@ -24,7 +25,7 @@ import { ScoreService } from "../shared/score/score.service";
         ProfileComponent,
         ScoreComponent
     ],
-    providers: [ScoreService],
+    providers: [ScoreService, UserService],
     schemas: [
         NO_ERRORS_SCHEMA
     ]

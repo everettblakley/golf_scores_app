@@ -25,7 +25,10 @@
             <Label class="h2" text="History"></Label>
             <Label class="h6" text="Sort by: N/A"></Label>
         </FlexboxLayout>
-        <RadListView [items]="scores" row="1" class="w100">
+        <FlexboxLayout *ngIf="noScores" row="1" justifyContent="center" alignItems="center">
+            <Label class="h3 text-primary" text="No scores to display"></Label>
+        </FlexboxLayout>
+        <RadListView [items]="scores" *ngIf="!noScores" row="1" class="w100">
             <ng-template tkListItemTemplate let-score="item">
                 <GridLayout class="score-list" (tap)="goToScore(score)" (longPress)="onLongPress(score)"
                     columns="auto, *" rows="auto" class="score-list__item" shadow="4">

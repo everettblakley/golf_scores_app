@@ -1,10 +1,12 @@
 import { HttpErrorResponse, HttpHeaders } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { firestore } from "nativescript-plugin-firebase";
-import * as firebase from "nativescript-plugin-firebase/app";
+import * as firebaseApp from "nativescript-plugin-firebase/app";
 import { from, throwError } from "rxjs";
 import { Observable } from "rxjs/internal/Observable";
-import { catchError, map } from "rxjs/operators";
+import { catchError, map, switchMap } from "rxjs/operators";
+import { User } from "./user/user";
+import { UserService } from "./user/user.service";
 
 /**
  * Base resource type
@@ -14,6 +16,7 @@ import { catchError, map } from "rxjs/operators";
  */
 export class Resource {
     id: string;
+    ownerId: string;
 }
 
 /**
@@ -42,7 +45,18 @@ export class FirebaseService<T extends Resource> {
 
         // The serializer to convert to/from JSON objects
         private serializer: Serializer,
+        private userService: UserService,
     ) { }
+
+    private currentUserId(): Observable<string> {
+        return from(
+            this.userService.currentUser()
+                .then((user: User) => {
+                    console.log(user);
+                    return user.id
+                })
+        );
+    }
 
 
     /**
@@ -53,14 +67,20 @@ export class FirebaseService<T extends Resource> {
      * @memberof FirebaseService
      */
     public create(item: T): Observable<any> {
-        return from(
-            firebase.firestore()
-                .collection(this.collection)
-                .add(this.serializer.toJson(item))
-        ).pipe(
-            map((data) => this.serializer.fromJson(data) as T),
-            catchError(this.handleErrors)
-        );
+        return this.currentUserId()
+            .pipe(
+                switchMap((id: string) => {
+                    console.log(id);
+                    item.ownerId = id;
+                    return from(
+                        firebaseApp.firestore()
+                            .collection(this.collection)
+                            .add(this.serializer.toJson(item))
+                    )
+                }),
+                map((data) => this.serializer.fromJson(data) as T),
+                catchError(this.handleErrors)
+            );
     }
 
     /**
@@ -72,7 +92,7 @@ export class FirebaseService<T extends Resource> {
      */
     public update(item: T): Observable<void> {
         return from(
-            firebase.firestore()
+            firebaseApp.firestore()
                 .collection(this.collection)
                 .doc(item.id)
                 .update(this.serializer.toJson(item))
@@ -90,7 +110,7 @@ export class FirebaseService<T extends Resource> {
      */
     public read(id: string): Observable<T> {
         return from(
-            firebase.firestore()
+            firebaseApp.firestore()
                 .collection(this.collection)
                 .doc(id)
                 .get({ source: "server" })
@@ -109,20 +129,36 @@ export class FirebaseService<T extends Resource> {
      * @memberof FirebaseService
      */
     public list(): Observable<T[]> {
-        return Observable.create(subscriber => {
-            const collectionRef = firebase.firestore().collection(this.collection);
-            collectionRef.onSnapshot((snapshot: firestore.QuerySnapshot) => {
-                let collection = [];
-                snapshot.forEach((document: firestore.DocumentSnapshot) => {
-                    collection.push({ id: document.id, ...document.data() })
-                });
-                subscriber.next(collection);
-            })
-        }
+        // return Observable.create(subscriber => {
+        //     const collectionRef = firebaseApp.firestore().collection(this.collection);
+        //     collectionRef.onSnapshot((snapshot: firestore.QuerySnapshot) => {
+        //         console.dir(snapshot);
+        //         let collection = [];
+        //         snapshot.forEach((document: firestore.DocumentSnapshot) => {
+        //             collection.push({ id: document.id, ...document.data() })
+        //         });
+        //         subscriber.next(collection);
+        //     })
+        // }).pipe(
+        //     map((data: any) => this.convertData(data)),
+        //     catchError(this.handleErrors)
+        // );
+        return from(
+            firebaseApp.firestore()
+                .collection(this.collection)
+                .get({ source: "server" })
+                .then((querySnapshot: firestore.QuerySnapshot) => {
+                    let docs = [];
+                    querySnapshot.forEach((doc: firestore.DocumentSnapshot) => {
+                        // console.log(doc.data());
+                        docs.push({ id: doc.id, ...doc.data() })
+                    })
+                    return docs;
+                })
         ).pipe(
             map((data: any) => this.convertData(data)),
             catchError(this.handleErrors)
-        );
+        )
     }
 
     /**
@@ -133,7 +169,7 @@ export class FirebaseService<T extends Resource> {
      * @memberof FirebaseService
      */
     public delete(id: string): Promise<void> {
-        return firebase.firestore()
+        return firebaseApp.firestore()
             .collection(this.collection)
             .doc(id)
             .delete()

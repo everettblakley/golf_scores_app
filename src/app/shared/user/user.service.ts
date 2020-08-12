@@ -3,7 +3,9 @@ import { User } from "./user";
 import * as firebase from "nativescript-plugin-firebase";
 import * as ApplicationSettings from "tns-core-modules/application-settings";
 
-@Injectable()
+@Injectable({
+  providedIn: "root",
+})
 export class UserService {
 
   constructor(ngZone: NgZone) {
@@ -37,6 +39,8 @@ export class UserService {
         }
       }).then((result: firebase.User) => {
         const userResult = new User(result.email, user.password, result.displayName);
+        userResult.id = result.uid;
+        userResult.ownerId = result.uid;
         resolve(userResult);
       }, (error: any) => {
         reject(error);
@@ -50,6 +54,8 @@ export class UserService {
         .then((userResult: firebase.User) => {
           const name = userResult.displayName || "No name";
           const user = new User(userResult.email, "", name, "");
+          user.id = userResult.uid;
+          user.ownerId = userResult.uid;
           resolve(user);
         })
         .catch(error => reject(error));

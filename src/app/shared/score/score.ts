@@ -13,6 +13,8 @@ export class Score extends Resource {
     public tees: string;
     // Default number of holes is 18
     public holes: number = 18;
+    public id: string;
+    public ownerId: string;
 
     constructor() {
         super();
@@ -26,6 +28,7 @@ export class Score extends Resource {
         this.conditions = "";
         this.tees = "";
         this.holes = 18;
+        this.ownerId = undefined;
     }
 }
 
@@ -42,6 +45,7 @@ export class ScoreSerializer implements Serializer {
         score.tees = json.tees;
         score.holes = json.holes;
         score.grossScore = json.grossScore;
+        score.ownerId = json.ownerId;
 
         return score;
     }
@@ -56,7 +60,8 @@ export class ScoreSerializer implements Serializer {
             conditions: resource.conditions,
             tees: resource.tees,
             holes: resource.holes,
-            grossScore: resource.grossScore
+            grossScore: resource.grossScore,
+            ownerId: resource.ownerId,
         };
     }
 }
