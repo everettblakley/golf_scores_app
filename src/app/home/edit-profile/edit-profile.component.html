@@ -1,0 +1,22 @@
+<ActionBar class="action-bar" title="Edit Profile">
+  <NavigationButton icon="res://backarrowwhite" (tap)="goBack()"></NavigationButton>
+  <ActionItem text="Save" *ngIf="savePossible" ios.systemIcon="4" ios.position="right"
+    android.position="actionBarIfRoom" (tap)="performSave()">
+  </ActionItem>
+</ActionBar>
+
+<GridLayout columns="*" rows="auto, *, auto" class="container">
+  <GridLayout row="0" columns="100" rows="100, auto" row="0" horizontalAlignment="center">
+    <Image class="profile-picture" src="res://defaultprofile" stretch="aspectFill" col="0" row="0">
+    </Image>
+    <Button row="1" class="btn btn-primary" text="Change picture" (tap)="notImplemented()"></Button>
+  </GridLayout>
+  <RadDataForm #form row="1" tkToggleNavButton [source]="user" [metadata]="userMetadata"
+    (propertyCommitted)="setChangesMade()">
+  </RadDataForm>
+  <StackLayout row="2">
+    <Button class="btn btn-primary" text="Change email address" (tap)="notImplemented()"></Button>
+    <Button class="btn btn-primary" text="Change password" (tap)="notImplemented()"></Button>
+    <Button class="btn btn-danger" text="Delete Account" (tap)="notImplemented()"></Button>
+  </StackLayout>
+</GridLayout>

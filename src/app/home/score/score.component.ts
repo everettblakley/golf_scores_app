@@ -10,7 +10,7 @@ import { ScoreService } from '~/app/shared/score/score.service';
 @Component({
   selector: 'ns-score',
   templateUrl: './score.component.html',
-  styleUrls: ['./score.component.css']
+  styleUrls: ['./score.component.css', "../home.component.css"]
 })
 export class ScoreComponent implements OnInit {
   public title: string;

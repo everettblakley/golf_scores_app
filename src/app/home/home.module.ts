@@ -9,6 +9,7 @@ import { ProfileComponent } from './profile/profile.component';
 import { ScoreComponent } from './score/score.component';
 import { ScoreService } from "../shared/score/score.service";
 import { UserService } from "../shared/user/user.service";
+import { EditProfileComponent } from './edit-profile/edit-profile.component';
 
 
 
@@ -23,7 +24,8 @@ import { UserService } from "../shared/user/user.service";
     declarations: [
         HomeComponent,
         ProfileComponent,
-        ScoreComponent
+        ScoreComponent,
+        EditProfileComponent
     ],
     providers: [ScoreService, UserService],
     schemas: [

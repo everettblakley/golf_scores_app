@@ -12,6 +12,10 @@ export class UserService {
 
   }
 
+  public update(user: User): Promise<any> {
+    return new Promise((resolve, reject) => resolve())
+  }
+
   public register(user: User): Promise<User> {
     return new Promise((resolve, reject) => {
       firebase.createUser({

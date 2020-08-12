@@ -1,5 +1,23 @@
 <ActionBar class="action-bar" title="Profile">
   <NavigationButton icon="res://backarrowwhite" (tap)="goBack()"></NavigationButton>
+  <ActionItem text="Logout" ios.systemIcon="4" ios.position="right" android.position="actionBarIfRoom" (tap)="logout()">
+  </ActionItem>
 </ActionBar>
 
-<Button text="Logout" (tap)="logout()" class="btn btn-primary"></Button>
+<StackLayout class="main">
+  <!-- Profile section -->
+  <GridLayout class="profile-section" columns="*" rows="auto, auto">
+    <GridLayout columns="100" rows="100" row="0" horizontalAlignment="center">
+      <Image class="profile-picture" src="res://defaultprofile" stretch="aspectFill" col="0" row="0">
+      </Image>
+    </GridLayout>
+    <FlexboxLayout *ngIf="!isLoading" class="user-info" row="1" flexDirection="column" justifyContent="center"
+      alignItems="center">
+      <Label class="h3" [text]="user.name"></Label>
+      <Button text="Edit Profile" (tap)="editProfile()" class="btn btn-primary"></Button>
+    </FlexboxLayout>
+  </GridLayout>
+  <GridLayout columns="*" rows="*" horizontalAlignment="center">
+    <Label verticalAlignment="center" text="Maybe some stuff here at some point"></Label>
+  </GridLayout>
+</StackLayout>

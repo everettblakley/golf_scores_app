@@ -1,13 +1,5 @@
-.header-text {
-  font-size: 18;
-}
-
 .main {
   padding: 16;
-}
-
-.user-name {
-  font-size: 24;
 }
 
 .profile-picture {
@@ -53,4 +45,24 @@
 .score-list__item-right {
   text-align: right;
   font-size: 14;
+}
+
+DataFormEditorLabel {
+  color: #000000;
+  font-size: 16;
+}
+
+DataFormEditorCore {
+  color: #4f4f4f;
+  font-size: 16;
+  padding: 16;
+  background-color: white;
+  border-color: #bababa;
+  border-width: 1;
+  border-radius: 4;
+}
+
+PropertyEditor:focus DataFormEditorCore {
+  border-color: #08a045;
+  border-width: 2;
 }
