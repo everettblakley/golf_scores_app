@@ -1,1 +1,27 @@
-/* Add mobile styles for the component here.  */
+.container {
+  margin: 16;
+}
+
+.save-button {
+  color: #fff;
+}
+
+DataFormEditorLabel {
+  color: #000000;
+  font-size: 16;
+}
+
+DataFormEditorCore {
+  color: #4f4f4f;
+  font-size: 16;
+  padding: 16;
+  background-color: white;
+  border-color: #bababa;
+  border-width: 1;
+  border-radius: 4;
+}
+
+PropertyEditor:focus DataFormEditorCore {
+  border-color: #08a045;
+  border-width: 2;
+}

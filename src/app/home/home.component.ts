@@ -99,7 +99,7 @@ export class HomeComponent implements OnInit {
 
     loadScores() {
         this.isLoading = true;
-        this.scoreSerivce.list({}).subscribe((loadedScores) => {
+        this.scoreSerivce.listScores().subscribe((loadedScores) => {
             this.scores = loadedScores;
             this.isLoading = false;
         });

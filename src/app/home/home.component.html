@@ -27,8 +27,8 @@
         </FlexboxLayout>
         <RadListView [items]="scores" row="1" class="w100">
             <ng-template tkListItemTemplate let-score="item">
-                <GridLayout (tap)="goToScore(score)" (longPress)="onLongPress(score)" columns="auto, *" rows="auto"
-                    class="score-list__item" shadow="4">
+                <GridLayout class="score-list" (tap)="goToScore(score)" (longPress)="onLongPress(score)"
+                    columns="auto, *" rows="auto" class="score-list__item" shadow="4">
                     <Label *ngIf="score" class="score-list__item-grossScore" [text]="score.grossScore" col="0"></Label>
                     <FlexboxLayout *ngIf="score" class="score-list__item-right" flexDirection="column"
                         justifyContent="flex-end" col="1">
@@ -38,8 +38,10 @@
                 </GridLayout>
             </ng-template>
         </RadListView>
-        <ActivityIndicator [busy]="isLoading" rowSpan="3"></ActivityIndicator>
+        <Button class="btn-primary" row="2" [enabled]="!isLoading" text="Add new score" (tap)="goToScore()"></Button>
+        <ActivityIndicator [busy]="isLoading" rowSpan="4"></ActivityIndicator>
     </GridLayout>
+
 </StackLayout>
 
-<FAB (tap)="goToScore()" icon="res://plus" rippleColor="#08a045" class="fab-button btn-primary"></FAB>
+<!-- <FAB (tap)="goToScore()" icon="res://plus" rippleColor="#08a045" class="fab-button btn-primary"></FAB> -->

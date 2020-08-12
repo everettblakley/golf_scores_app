@@ -1,9 +1,10 @@
-import { HttpClient, HttpHeaders, HttpErrorResponse } from "@angular/common/http";
-import { Observable } from "rxjs/internal/Observable";
-import { from } from "rxjs";
-import { map, catchError } from "rxjs/operators";
-import { throwError } from "rxjs";
+import { HttpErrorResponse, HttpHeaders } from "@angular/common/http";
+import { Injectable } from "@angular/core";
+import { firestore } from "nativescript-plugin-firebase";
 import * as firebase from "nativescript-plugin-firebase/app";
+import { from, throwError } from "rxjs";
+import { Observable } from "rxjs/internal/Observable";
+import { catchError, map } from "rxjs/operators";
 
 /**
  * Base resource type
@@ -33,13 +34,14 @@ export interface Serializer {
  * @class FirebaseService
  * @template T
  */
+@Injectable()
 export class FirebaseService<T extends Resource> {
     constructor(
         // The name of the collection in Firebase
-        private collection: string,
+        protected collection: string,
 
         // The serializer to convert to/from JSON objects
-        private serializer: Serializer
+        private serializer: Serializer,
     ) { }
 
 
@@ -65,17 +67,16 @@ export class FirebaseService<T extends Resource> {
      * Method to update an object of type {T}
      *
      * @param {T} item
-     * @returns {Observable<T>}
+     * @returns {Observable<void>}
      * @memberof FirebaseService
      */
-    public update(item: T): Observable<T> {
+    public update(item: T): Observable<void> {
         return from(
             firebase.firestore()
                 .collection(this.collection)
                 .doc(item.id)
                 .update(this.serializer.toJson(item))
         ).pipe(
-            map((data) => this.serializer.fromJson(data) as T),
             catchError(this.handleErrors)
         );
     }
@@ -107,16 +108,17 @@ export class FirebaseService<T extends Resource> {
      * @returns {Observable<T[]>}
      * @memberof FirebaseService
      */
-    public list(queryOptions: any): Observable<T[]> {
-        return from(
-            firebase.firestore()
-                .collection(this.collection)
-                .get(queryOptions)
-                .then((snapshot) => {
-                    let result = []
-                    snapshot.forEach(doc => result.push({ id: doc.id, ...doc.data() }))
-                    return result;
-                })
+    public list(): Observable<T[]> {
+        return Observable.create(subscriber => {
+            const collectionRef = firebase.firestore().collection(this.collection);
+            collectionRef.onSnapshot((snapshot: firestore.QuerySnapshot) => {
+                let collection = [];
+                snapshot.forEach((document: firestore.DocumentSnapshot) => {
+                    collection.push({ id: document.id, ...document.data() })
+                });
+                subscriber.next(collection);
+            })
+        }
         ).pipe(
             map((data: any) => this.convertData(data)),
             catchError(this.handleErrors)
@@ -127,10 +129,10 @@ export class FirebaseService<T extends Resource> {
      * Deleted an object of type {T} given the id
      *
      * @param {number} id
-     * @returns
+     * @returns {Promise<void>}
      * @memberof FirebaseService
      */
-    public delete(id: string) {
+    public delete(id: string): Promise<void> {
         return firebase.firestore()
             .collection(this.collection)
             .doc(id)

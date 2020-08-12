@@ -1,5 +1,12 @@
 <ActionBar [title]="title" class="action-bar">
   <NavigationButton icon="res://backarrowwhite" (tap)="goBack()"></NavigationButton>
+  <ActionItem *ngIf="savePossible" text="Save" ios.systemIcon="4" ios.position="right"
+    android.position="actionBarIfRoom" (tap)="performSave()">
+  </ActionItem>
 </ActionBar>
 
-<Button text="score works!" class="btn btn-primary"></Button>
+<StackLayout class="container">
+  <RadDataForm #scoreForm tkToggleNavButton [source]="score" [metadata]="scoreMetadata"
+    (propertyCommitted)="setChangesMade()">
+  </RadDataForm>
+</StackLayout>
