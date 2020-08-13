@@ -37,8 +37,7 @@ export class EditProfileComponent implements OnInit {
               return;
             }
             case true: {
-              this.performSave()
-                .then(() => this.router.backToPreviousPage());
+              this.performSave();
             }
           }
         })
@@ -51,7 +50,7 @@ export class EditProfileComponent implements OnInit {
 
   public notifySaveSuccessful = () => dialogs.alert({
     title: "Save Successful!",
-    message: "Your score was successfully saved",
+    message: "Your account has been updated. Please login in again to see the changes",
     okButtonText: "Ok"
   });
 
@@ -77,8 +76,8 @@ export class EditProfileComponent implements OnInit {
         .then(() => {
           this.notifySaveSuccessful()
             .then(() => {
-              this.savePossible = false;
-              resolve()
+              this.userService.logout()
+                .then(() => this.router.navigate(["/login"], { clearHistory: true }));
             });
         })
         .catch((error) => {

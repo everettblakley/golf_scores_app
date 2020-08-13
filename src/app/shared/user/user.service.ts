@@ -12,8 +12,35 @@ export class UserService {
 
   }
 
-  public update(user: User): Promise<any> {
-    return new Promise((resolve, reject) => resolve())
+  public uploadPhoto(path: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.currentUser()
+        .then((user: User) => {
+          firebase.storage.uploadFile({
+            remoteFullPath: "userPhotos/" + user.id + ".jpg",
+            localFile: path,
+            onProgress: function (status) {
+              console.log("Upload facetion: " + status.fractionCompleted)
+            }
+          }).then(
+            (uploadedFile) => resolve(uploadedFile),
+            (error) => reject(error)
+          )
+        })
+        .catch((error) => reject(error))
+    });
+  }
+
+  public update(user: User, photoUrl?: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      firebase.updateProfile({
+        displayName: user.name,
+        photoURL: photoUrl
+      }).then(
+        () => resolve(),
+        () => reject()
+      );
+    })
   }
 
   public register(user: User): Promise<User> {
@@ -24,12 +51,12 @@ export class UserService {
       }).then((registerResult: firebase.User) => {
         firebase.updateProfile({
           displayName: user.name
-        }).then(() => {
-          resolve(user);
-        })
-          .catch((error) => reject(error))
-      }, (error: any) =>
-        reject(error))
+        }).then(
+          () => resolve(user),
+          (error) => reject(error))
+      },
+        (error: any) => reject(error)
+      )
     });
   }
 
@@ -46,9 +73,7 @@ export class UserService {
         userResult.id = result.uid;
         userResult.ownerId = result.uid;
         resolve(userResult);
-      }, (error: any) => {
-        reject(error);
-      });
+      }, (error: any) => reject(error));
     });
   }
 
@@ -61,8 +86,9 @@ export class UserService {
           user.id = userResult.uid;
           user.ownerId = userResult.uid;
           resolve(user);
-        })
-        .catch(error => reject(error));
+        },
+          error => reject(error)
+        );
     })
   }
 
@@ -73,8 +99,9 @@ export class UserService {
         .then(() => {
           ApplicationSettings.remove("lastAuthenticated");
           resolve()
-        })
-        .catch((error: any) => reject(error))
+        },
+          (error: any) => reject(error)
+        )
     })
   }
 }

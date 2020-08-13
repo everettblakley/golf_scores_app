@@ -7,6 +7,7 @@ export class User extends Resource {
   public email: string;
   public password: string;
   public confirmPassword: string;
+  public photoUrl: string;
   public id: string;
   public ownerId: string;
 
@@ -16,6 +17,7 @@ export class User extends Resource {
     this.name = name;
     this.password = password;
     this.confirmPassword = confirmPassword;
+    this.photoUrl = undefined;
     this.ownerId = undefined;
   }
 
@@ -32,6 +34,7 @@ export class UserSerializer implements Serializer {
     user.name = json.name;
     user.email = json.email;
     user.password = ""
+    user.photoUrl = json.photoUrl;
     return user;
   }
   toJson(resource: User) {
@@ -39,7 +42,8 @@ export class UserSerializer implements Serializer {
       id: resource.id,
       name: resource.name,
       email: resource.email,
-      password: resource.password
+      password: resource.password,
+      photoUrl: resource.photoUrl
     };
   }
 

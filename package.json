@@ -21,6 +21,7 @@
     "@angular/platform-browser-dynamic": "~8.2.0",
     "@angular/router": "~8.2.0",
     "@nativescript/theme": "~2.3.0",
+    "@nstudio/nativescript-camera-plus": "^3.0.7",
     "@nstudio/nativescript-floatingactionbutton": "^2.1.0",
     "@types/jest": "^26.0.9",
     "email-validator": "^2.0.4",

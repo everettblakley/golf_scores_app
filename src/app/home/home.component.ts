@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, OnDestroy, ElementRef, ViewChild } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { RouterExtensions } from "nativescript-angular/router";
 import * as dialogs from "tns-core-modules/ui/dialogs";
@@ -8,6 +8,10 @@ import { ScoreService } from "../shared/score/score.service";
 import { User } from "../shared/user/user";
 import { UserService } from "../shared/user/user.service";
 import { formatDate } from "../shared/utils/utils";
+import { Page, NavigatedData } from "tns-core-modules/ui/page";
+import { Subscription } from "rxjs";
+import { ObservableArray } from "tns-core-modules/data/observable-array";
+import { RadListView, ListViewEventData } from "nativescript-ui-listview";
 
 
 @Component({
@@ -20,19 +24,14 @@ export class HomeComponent implements OnInit {
     public scores: Score[] = [];
     public isLoading: boolean = false;
     public user: User;
-    public production: string = "";
     public sortOptions = ["Date (ascending)", "Date (descending)", "Highest first", "Lowest first"];
+    public scoreSubscription: Subscription;
 
-    constructor(private scoreSerivce: ScoreService, private router: RouterExtensions, private userService: UserService, private activateRoute: ActivatedRoute) {
-        this.production = environment.production ? "production" : "dev";
+    constructor(private scoreSerivce: ScoreService, private router: RouterExtensions, private userService: UserService, private activateRoute: ActivatedRoute, private page: Page) {
         this.user = new User("", "", "Loading...", "");
     }
 
     get noScores() { return this.scores.length === 0; }
-
-    dosomething() {
-        alert("To be implemented: Navigate to profile");
-    }
 
     goToProfile() {
         this.router.navigate(["profile"], {
@@ -73,14 +72,19 @@ export class HomeComponent implements OnInit {
                     message: "Are you sure you want to delete this score?",
                     okButtonText: "Delete",
                     cancelButtonText: "Cancel"
-                }).then(() => console.log("Deleting score " + score.id))
+                }).then(() => this.scoreSerivce.delete(score.id)
+                    .then(() => this.loadScores(),
+                        (error) => dialogs.alert({
+                            title: "An error occurred",
+                            message: "Something went wrong and your score could not be deleted",
+                            okButtonText: "Ok"
+                        }).then(() => console.dir(error)))
+                )
             } else {
                 this.goToScore(score);
             }
         })
     }
-
-    toString = (item: any) => (JSON.stringify(item));
 
     ngOnInit(): void {
         this.userService.currentUser()
@@ -94,6 +98,15 @@ export class HomeComponent implements OnInit {
                 console.log(error);
                 this.router.navigate(['/login']);
             })
+        this.page.on('navigatedTo', (data: NavigatedData) => {
+            if (data.isBackNavigation) {
+                console.log("reloading scores");
+                this.loadScores();
+                // Not sure why I need to explicitly call this, but I do?
+                this.isLoading = false;
+            }
+        });
+
         this.loadScores();
     }
 
@@ -105,6 +118,8 @@ export class HomeComponent implements OnInit {
             (loadedScores) => {
                 this.scores = loadedScores;
                 this.isLoading = false;
+
+                console.log("scores loaded");
             },
             (error) => {
                 dialogs.alert({

@@ -25,7 +25,7 @@
             <Label class="h2" text="History"></Label>
             <Label class="h6" text="Sort by: N/A"></Label>
         </FlexboxLayout>
-        <FlexboxLayout *ngIf="noScores" row="1" justifyContent="center" alignItems="center">
+        <FlexboxLayout *ngIf="noScores && !isLoading" row="1" justifyContent="center" alignItems="center">
             <Label class="h3 text-primary" text="No scores to display"></Label>
         </FlexboxLayout>
         <RadListView [items]="scores" *ngIf="!noScores" row="1" class="w100">

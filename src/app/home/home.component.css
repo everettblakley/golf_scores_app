@@ -55,7 +55,7 @@ DataFormEditorLabel {
 DataFormEditorCore {
   color: #4f4f4f;
   font-size: 16;
-  padding: 16;
+  padding: 12;
   background-color: white;
   border-color: #bababa;
   border-width: 1;
@@ -65,4 +65,14 @@ DataFormEditorCore {
 PropertyEditor:focus DataFormEditorCore {
   border-color: #08a045;
   border-width: 2;
+}
+
+PropertyEditor[type="List"] DataFormEditorCore {
+  padding: 0;
+  border: none;
+}
+
+PropertyEditor[type="SegmentedEditor"] DataFormEditorCore {
+  padding: 0;
+  border: none;
 }

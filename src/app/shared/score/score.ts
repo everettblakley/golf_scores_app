@@ -1,6 +1,7 @@
 import { Resource, Serializer } from "../genericFirebaseService";
 import * as moment from "moment";
 import { FirebaseHttpMetric } from "nativescript-plugin-firebase/performance/performance";
+import { ScoreService } from "./score.service";
 
 export class Score extends Resource {
     public course: string;
@@ -13,6 +14,7 @@ export class Score extends Resource {
     public tees: string;
     // Default number of holes is 18
     public holes: number = 18;
+    public notes: string;
     public id: string;
     public ownerId: string;
 
@@ -20,14 +22,15 @@ export class Score extends Resource {
         super();
         this.id = undefined;
         this.course = "";
-        this.grossScore = 0;
-        this.scoreDate = moment();
+        this.grossScore = null;
+        this.scoreDate = null;
         this.createdAt = moment();
-        this.slope = 0;
-        this.rating = 0;
-        this.conditions = "";
-        this.tees = "";
+        this.slope = null;
+        this.rating = null;
+        this.conditions = null;
+        this.tees = null;
         this.holes = 18;
+        this.notes = "";
         this.ownerId = undefined;
     }
 }
@@ -46,6 +49,7 @@ export class ScoreSerializer implements Serializer {
         score.holes = json.holes;
         score.grossScore = json.grossScore;
         score.ownerId = json.ownerId;
+        score.notes = json.notes;
 
         return score;
     }
@@ -62,6 +66,7 @@ export class ScoreSerializer implements Serializer {
             holes: resource.holes,
             grossScore: resource.grossScore,
             ownerId: resource.ownerId,
+            notes: resource.notes
         };
     }
 }

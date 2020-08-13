@@ -34,12 +34,15 @@ export class ScoreComponent implements OnInit {
         .then((option) => {
           switch (option) {
             case undefined: {
+              // Discard changes
               this.router.backToPreviousPage();
             }
             case false: {
+              // Cancel
               return;
             }
             case true: {
+              // Save changes
               this.performSave()
                 .then(() => this.router.backToPreviousPage());
             }
@@ -151,7 +154,8 @@ export class ScoreComponent implements OnInit {
               "errorMessage": "Please enter a course name"
             }
           }
-        ]
+        ],
+        "groupName": "Required Information"
       },
       {
         "name": "grossScore",
@@ -168,7 +172,8 @@ export class ScoreComponent implements OnInit {
               "errorMessage": "Please enter a valid gross score"
             }
           }
-        ]
+        ],
+        "groupName": "Required Information"
       },
       {
         "name": "scoreDate",
@@ -176,6 +181,15 @@ export class ScoreComponent implements OnInit {
         "index": 2,
         "editor": "DatePicker",
         "required": true,
+        "validators": [
+          {
+            "name": "NonEmpty",
+            "params": {
+              "errorMessage": "Please enter a date"
+            }
+          }
+        ],
+        "groupName": "Required Information"
       },
       {
         "name": "slope",
@@ -187,11 +201,13 @@ export class ScoreComponent implements OnInit {
           {
             "name": "Range",
             "params": {
-              "minimum": 0,
-              "errorMessage": "Please enter a value greater than 0"
+              "minimum": 55,
+              "maximum": 155,
+              "errorMessage": "Please enter a value between 55 and 155"
             }
           }
-        ]
+        ],
+        "groupName": "Required Information"
       },
       {
         "name": "rating",
@@ -207,7 +223,8 @@ export class ScoreComponent implements OnInit {
               "errorMessage": "Please enter a value greater than 0"
             }
           }
-        ]
+        ],
+        "groupName": "Required Information"
       },
       {
         "name": "holes",
@@ -215,7 +232,8 @@ export class ScoreComponent implements OnInit {
         "index": 5,
         "editor": "SegmentedEditor",
         "valuesProvider": [18, 9],
-        "required": true
+        "required": true,
+        "groupName": "Required Information"
       },
       {
         "name": "conditions",
@@ -223,7 +241,8 @@ export class ScoreComponent implements OnInit {
         "index": 6,
         "required": false,
         "editor": "List",
-        "valuesProvider": ["Sunny", "Rainy", "Windy", "Cloudy with a chance of Meatballs"]
+        "valuesProvider": ["Sunny", "Rainy", "Windy",],
+        "groupName": "Optional Information"
       },
       {
         "name": "tees",
@@ -231,7 +250,25 @@ export class ScoreComponent implements OnInit {
         "index": 7,
         "required": false,
         "editor": "SegmentedEditor",
-        "valuesProvider": ["Blue", "Red", "White"]
+        "valuesProvider": ["Blue", "Red", "White"],
+        "groupName": "Optional Information"
+      },
+      {
+        "name": "notes",
+        "displayName": "Notes",
+        "index": 8,
+        "required": false,
+        "editor": "MultilineText",
+        "groupName": "Optional Information",
+        "validators": [
+          {
+            "name": "MaximumLength",
+            "params": {
+              "length": 255,
+              "errorMessage": "Please enter less than 255 characters"
+            }
+          }
+        ]
       },
       {
         "name": "createdAt",
@@ -241,6 +278,10 @@ export class ScoreComponent implements OnInit {
         "name": "id",
         "ignore": true
       },
+      {
+        "name": "ownerId",
+        "ignore": true
+      }
 
     ]
   }

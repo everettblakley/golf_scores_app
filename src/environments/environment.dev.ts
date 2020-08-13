@@ -4,5 +4,6 @@ export const environment = {
     userPoolId: "us-east-1_xxT3j8KZt",
     clientId: "2r2sbeuuih2m5n9cf32bro4ltc",
     dbName: "golf-handicap-dev",
-    dbUserKey: "golf-handicap-couchdb-user-key"
+    dbUserKey: "golf-handicap-couchdb-user-key",
+    firebasePhotoBucket: "gs://golf-scores-1ff8f.appspot.com"
 };

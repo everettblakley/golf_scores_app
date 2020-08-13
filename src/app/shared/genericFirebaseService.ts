@@ -52,7 +52,6 @@ export class FirebaseService<T extends Resource> {
         return from(
             this.userService.currentUser()
                 .then((user: User) => {
-                    console.log(user);
                     return user.id
                 })
         );
@@ -70,7 +69,6 @@ export class FirebaseService<T extends Resource> {
         return this.currentUserId()
             .pipe(
                 switchMap((id: string) => {
-                    console.log(id);
                     item.ownerId = id;
                     return from(
                         firebaseApp.firestore()
