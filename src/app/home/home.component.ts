@@ -1,17 +1,14 @@
-import { Component, OnInit, OnDestroy, ElementRef, ViewChild } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { RouterExtensions } from "nativescript-angular/router";
+import { Subscription } from "rxjs";
 import * as dialogs from "tns-core-modules/ui/dialogs";
-import { environment } from "~/environments/environment.dev";
+import { NavigatedData, Page } from "tns-core-modules/ui/page";
 import { Score } from "../shared/score/score";
 import { ScoreService } from "../shared/score/score.service";
 import { User } from "../shared/user/user";
 import { UserService } from "../shared/user/user.service";
 import { formatDate } from "../shared/utils/utils";
-import { Page, NavigatedData } from "tns-core-modules/ui/page";
-import { Subscription } from "rxjs";
-import { ObservableArray } from "tns-core-modules/data/observable-array";
-import { RadListView, ListViewEventData } from "nativescript-ui-listview";
 
 
 @Component({

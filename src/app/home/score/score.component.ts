@@ -125,6 +125,12 @@ export class ScoreComponent implements OnInit {
     if (params.id == undefined) {
       this.title = "New Score";
       this.score = new Score();
+      this.scoreService.create(this.score)
+        .subscribe((score: Score) => {
+          this.score = score;
+          this.savePossible = true;
+          this.isLoading = false;
+        })
       this.savePossible = true;
       this.isLoading = false;
     } else {
@@ -133,7 +139,8 @@ export class ScoreComponent implements OnInit {
         .subscribe((score: Score) => {
           this.score = score;
           this.isLoading = false;
-        });
+        },
+          (error) => console.log(error));
     }
   }
 
