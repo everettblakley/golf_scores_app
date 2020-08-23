@@ -14,7 +14,7 @@
         </GridLayout>
         <FlexboxLayout class="user-info" col="1" row="0" flexDirection="column" justifyContent="center">
             <Label class="h3" [text]="user.name"></Label>
-            <Label class="h6" text="Current Handicap"></Label>
+            <Label class="h6" [text]="currentHandicap"></Label>
             <Label class="font-italic" textDecoration="underline" text="View profile" (tap)="goToProfile()"></Label>
         </FlexboxLayout>
     </GridLayout>

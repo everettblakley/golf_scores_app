@@ -1,5 +1,5 @@
 {
-    "using_ios": true,
+    "using_ios": false,
     "using_android": true,
     "analytics": false,
     "firestore": true,
@@ -11,10 +11,10 @@
     "messaging": false,
     "in_app_messaging": false,
     "crashlytics": false,
-    "storage": true,
-    "functions": false,
+    "storage": false,
+    "functions": true,
     "facebook_auth": false,
-    "google_auth": true,
+    "google_auth": false,
     "admob": false,
     "dynamic_links": false,
     "ml_kit": false

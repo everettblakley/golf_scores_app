@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { RouterExtensions } from "nativescript-angular/router";
 import { Subscription } from "rxjs";
@@ -9,6 +9,7 @@ import { ScoreService } from "../shared/score/score.service";
 import { User } from "../shared/user/user";
 import { UserService } from "../shared/user/user.service";
 import { formatDate } from "../shared/utils/utils";
+import { HandicapService } from "../shared/handicap/handicap.service";
 
 
 @Component({
@@ -17,18 +18,49 @@ import { formatDate } from "../shared/utils/utils";
     templateUrl: "./home.component.html",
     styleUrls: ["./home.component.css"],
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, OnDestroy {
     public scores: Score[] = [];
     public isLoading: boolean = false;
     public user: User;
     public sortOptions = ["Date (ascending)", "Date (descending)", "Highest first", "Lowest first"];
-    public scoreSubscription: Subscription;
+    private scoreSubscription: Subscription;
+    private handicapSubscription: Subscription;
 
-    constructor(private scoreSerivce: ScoreService, private router: RouterExtensions, private userService: UserService, private activateRoute: ActivatedRoute, private page: Page) {
+    public handicap: number;
+
+    constructor(private scoreSerivce: ScoreService,
+        private router: RouterExtensions,
+        private userService: UserService,
+        private handicapService: HandicapService,
+        private activateRoute: ActivatedRoute,
+        private page: Page,
+        private changeDetectorRef: ChangeDetectorRef) {
         this.user = new User("", "", "Loading...", "");
+        this.router.router.onSameUrlNavigation = "reload";
+    }
+
+    ngOnDestroy(): void {
+        if (this.scoreSubscription) {
+            this.scoreSubscription.unsubscribe();
+        }
+        if (this.handicapSubscription) {
+            this.handicapSubscription.unsubscribe();
+        }
     }
 
     get noScores() { return this.scores.length === 0; }
+
+    get currentHandicap() {
+        return `Current Handicap: ${
+            this.handicap === undefined
+                ? this.isLoading
+                    ? "loading..."
+                    : "unknown" :
+                this.handicap === null
+                    ? "N/A"
+                    : this.handicap
+            }`
+    }
 
     goToProfile() {
         this.router.navigate(["profile"], {
@@ -70,7 +102,7 @@ export class HomeComponent implements OnInit {
                     okButtonText: "Delete",
                     cancelButtonText: "Cancel"
                 }).then(() => this.scoreSerivce.delete(score.id)
-                    .then(() => this.loadScores(),
+                    .then(() => this.init(),
                         (error) => dialogs.alert({
                             title: "An error occurred",
                             message: "Something went wrong and your score could not be deleted",
@@ -94,29 +126,55 @@ export class HomeComponent implements OnInit {
                 });
                 console.log(error);
                 this.router.navigate(['/login']);
+                return;
             })
         this.page.on('navigatedTo', (data: NavigatedData) => {
             if (data.isBackNavigation) {
-                console.log("reloading scores");
-                this.loadScores();
-                // Not sure why I need to explicitly call this, but I do?
-                this.isLoading = false;
+                this.init();
             }
         });
 
-        this.loadScores();
+        this.init();
     }
 
     formatDate = (date: string, format: string) => formatDate(date, format);
 
-    loadScores() {
+    init() {
         this.isLoading = true;
-        this.scoreSerivce.list().subscribe(
+        this.loadHandicap();
+        this.loadScores();
+    }
+
+    loadHandicap() {
+        this.handicapSubscription = this.handicapService.getHandicap().subscribe(
+            (handicap) => {
+                if (handicap !== undefined) {
+                    this.handicap = handicap;
+                }
+                this.changeDetectorRef.detectChanges();
+                if (this.isLoading) {
+                    this.isLoading = false;
+                }
+                return;
+            },
+            (error) => {
+                dialogs.alert({
+                    title: "An error occurred",
+                    message: "We were unable to retrieve your handicap. Please try again later",
+                    okButtonText: "Ok"
+                });
+                console.log(error);
+                return;
+            }
+        )
+    }
+
+    loadScores() {
+        this.scoreSubscription = this.scoreSerivce.list().subscribe(
             (loadedScores) => {
                 this.scores = loadedScores;
-                this.isLoading = false;
-
-                console.log("scores loaded");
+                this.changeDetectorRef.detectChanges();
+                return;
             },
             (error) => {
                 dialogs.alert({
@@ -124,8 +182,8 @@ export class HomeComponent implements OnInit {
                     message: "We were unable to retrieve your scores. Please try again later",
                     okButtonText: "Ok"
                 });
-                this.isLoading = false;
                 console.log(error);
+                return;
             });
     }
 }

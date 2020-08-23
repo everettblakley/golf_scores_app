@@ -57,8 +57,8 @@ export class ScoreSerializer implements Serializer {
         return {
             id: resource.id,
             course: resource.course,
-            createdAt: resource.createdAt.toISOString(),
-            scoreDate: resource.scoreDate.toISOString(),
+            createdAt: resource.createdAt == undefined ? null : resource.createdAt.toISOString(),
+            scoreDate: resource.scoreDate == undefined ? null : resource.scoreDate.toISOString(),
             slope: resource.slope,
             rating: resource.rating,
             conditions: resource.conditions,

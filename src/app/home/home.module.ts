@@ -10,6 +10,7 @@ import { ScoreComponent } from './score/score.component';
 import { ScoreService } from "../shared/score/score.service";
 import { UserService } from "../shared/user/user.service";
 import { EditProfileComponent } from './edit-profile/edit-profile.component';
+import { HandicapService } from "../shared/handicap/handicap.service";
 
 
 
@@ -27,7 +28,7 @@ import { EditProfileComponent } from './edit-profile/edit-profile.component';
         ScoreComponent,
         EditProfileComponent
     ],
-    providers: [ScoreService, UserService],
+    providers: [ScoreService, UserService, HandicapService],
     schemas: [
         NO_ERRORS_SCHEMA
     ]
