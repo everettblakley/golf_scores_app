@@ -10,7 +10,8 @@ import { User } from "../shared/user/user";
 import { UserService } from "../shared/user/user.service";
 import { formatDate } from "../shared/utils/utils";
 import { HandicapService } from "../shared/handicap/handicap.service";
-
+import { SortMethod, SortOption } from "../shared/utils/utilTypes";
+import * as moment from "moment";
 
 @Component({
     selector: "Home",
@@ -19,14 +20,16 @@ import { HandicapService } from "../shared/handicap/handicap.service";
     styleUrls: ["./home.component.css"],
 })
 export class HomeComponent implements OnInit, OnDestroy {
-    public scores: Score[] = [];
-    public isLoading: boolean = false;
     public user: User;
-    public sortOptions = ["Date (ascending)", "Date (descending)", "Highest first", "Lowest first"];
+    public scores: Score[] = [];
+    public handicapIsLoading: boolean = false;
+    public historyIsLoading: boolean = false;
+    public sortOptions: SortOption[];
+    public selectedSortOption: SortOption;
+    public handicap: number;
+
     private scoreSubscription: Subscription;
     private handicapSubscription: Subscription;
-
-    public handicap: number;
 
     constructor(private scoreSerivce: ScoreService,
         private router: RouterExtensions,
@@ -35,8 +38,38 @@ export class HomeComponent implements OnInit, OnDestroy {
         private activateRoute: ActivatedRoute,
         private page: Page,
         private changeDetectorRef: ChangeDetectorRef) {
+
         this.user = new User("", "", "Loading...", "");
         this.router.router.onSameUrlNavigation = "reload";
+
+        this.sortOptions = [
+            {
+                label: "Date (Oldest first)",
+                method: SortMethod.DATE_ASC
+            },
+            {
+                label: "Date (Newest first)",
+                method: SortMethod.DATE_DESC
+            },
+            {
+                label: "Score (Ascending)",
+                method: SortMethod.SCORE_ASC
+            },
+            {
+                label: "Score (Descending)",
+                method: SortMethod.SCORE_DESC
+            },
+            {
+                label: "Course Name (Ascending)",
+                method: SortMethod.COURSE_ASC
+            },
+            {
+                label: "Course Name (Descending)",
+                method: SortMethod.DATE_DESC
+            },
+        ]
+
+        this.selectedSortOption = this.sortOptions[1];
     }
 
     ngOnDestroy(): void {
@@ -50,10 +83,12 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     get noScores() { return this.scores.length === 0; }
 
+    get sortByText() { return `Sort By: ${this.selectedSortOption.label}` }
+
     get currentHandicap() {
         return `Current Handicap: ${
             this.handicap === undefined
-                ? this.isLoading
+                ? this.handicapIsLoading
                     ? "loading..."
                     : "unknown" :
                 this.handicap === null
@@ -102,7 +137,7 @@ export class HomeComponent implements OnInit, OnDestroy {
                     okButtonText: "Delete",
                     cancelButtonText: "Cancel"
                 }).then(() => this.scoreSerivce.delete(score.id)
-                    .then(() => this.init(),
+                    .then(() => this.load(),
                         (error) => dialogs.alert({
                             title: "An error occurred",
                             message: "Something went wrong and your score could not be deleted",
@@ -130,31 +165,29 @@ export class HomeComponent implements OnInit, OnDestroy {
             })
         this.page.on('navigatedTo', (data: NavigatedData) => {
             if (data.isBackNavigation) {
-                this.init();
+                this.load();
             }
         });
 
-        this.init();
+        this.load();
     }
 
     formatDate = (date: string, format: string) => formatDate(date, format);
 
-    init() {
-        this.isLoading = true;
+    load() {
         this.loadHandicap();
         this.loadScores();
     }
 
     loadHandicap() {
+        this.handicapIsLoading = true;
         this.handicapSubscription = this.handicapService.getHandicap().subscribe(
             (handicap) => {
                 if (handicap !== undefined) {
                     this.handicap = handicap;
                 }
                 this.changeDetectorRef.detectChanges();
-                if (this.isLoading) {
-                    this.isLoading = false;
-                }
+                this.handicapIsLoading = false;
                 return;
             },
             (error) => {
@@ -164,16 +197,20 @@ export class HomeComponent implements OnInit, OnDestroy {
                     okButtonText: "Ok"
                 });
                 console.log(error);
+                this.handicapIsLoading = false;
                 return;
             }
         )
     }
 
     loadScores() {
+        this.historyIsLoading = true;
         this.scoreSubscription = this.scoreSerivce.list().subscribe(
             (loadedScores) => {
                 this.scores = loadedScores;
+                this.sortScores();
                 this.changeDetectorRef.detectChanges();
+                this.historyIsLoading = false;
                 return;
             },
             (error) => {
@@ -183,7 +220,70 @@ export class HomeComponent implements OnInit, OnDestroy {
                     okButtonText: "Ok"
                 });
                 console.log(error);
+                this.historyIsLoading = false;
                 return;
             });
+    }
+
+    changeSortMethod() {
+        dialogs.action({
+            title: "Sort Scores",
+            cancelButtonText: "Cancel",
+            actions: this.sortOptions.map((option) => option.label)
+        }).then((newOption) => {
+            console.log(newOption);
+            if (newOption === "Cancel") return;
+            this.selectedSortOption = this.sortOptions.find((option) => option.label === newOption);
+            this.sortScores();
+        })
+    }
+
+    sortScores() {
+        switch (this.selectedSortOption.method) {
+            case SortMethod.DATE_ASC:
+                this.scores = this.scores.sort((a: Score, b: Score) => {
+                    const aDate = moment(a.scoreDate);
+                    const bDate = moment(b.scoreDate);
+                    return aDate.isAfter(bDate, "day")
+                        ? 1
+                        : aDate.isBefore(bDate, "day")
+                            ? -1
+                            : 0;
+                })
+                break;
+            case SortMethod.DATE_DESC:
+                this.scores = this.scores.sort((a: Score, b: Score) => {
+                    const aDate = moment(a.scoreDate);
+                    const bDate = moment(b.scoreDate);
+                    return aDate.isBefore(bDate, "day")
+                        ? 1
+                        : aDate.isAfter(bDate, "day")
+                            ? -1
+                            : 0;
+                })
+                break;
+            case SortMethod.SCORE_ASC:
+                this.scores = this.scores.sort((a: Score, b: Score) => {
+                    return a.grossScore > b.grossScore
+                        ? 1
+                        : a.grossScore < b.grossScore
+                            ? -1
+                            : 0;
+                })
+                break;
+            case SortMethod.SCORE_DESC:
+                this.scores = this.scores.sort((a: Score, b: Score) => {
+                    return a.grossScore < b.grossScore
+                        ? 1
+                        : a.grossScore > b.grossScore
+                            ? -1
+                            : 0;
+                })
+                break;
+            default:
+                break;
+        }
+        console.dir(this.scores.map(score => moment(score.scoreDate).toISOString()));
+        // this.changeDetectorRef.detectChanges();
     }
 }

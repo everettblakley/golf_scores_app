@@ -23,9 +23,9 @@
     <GridLayout columns="*" rows="auto, *, auto">
         <FlexboxLayout class="score-list__header" row="0" col="0" justifyContent="space-between" alignItems="center">
             <Label class="h2" text="History"></Label>
-            <Label class="h6" text="Sort by: N/A"></Label>
+            <Label [text]="sortByText" (tap)="changeSortMethod()"></Label>
         </FlexboxLayout>
-        <FlexboxLayout *ngIf="noScores && !isLoading" row="1" justifyContent="center" alignItems="center">
+        <FlexboxLayout *ngIf="noScores && !historyIsLoading" row="1" justifyContent="center" alignItems="center">
             <Label class="h3 text-primary" text="No scores to display"></Label>
         </FlexboxLayout>
         <RadListView #scoreList [items]="scores" *ngIf="!noScores" row="1" class="w100">
@@ -41,8 +41,9 @@
                 </GridLayout>
             </ng-template>
         </RadListView>
-        <Button class="btn-primary" row="2" [enabled]="!isLoading" text="Add new score" (tap)="goToScore()"></Button>
-        <ActivityIndicator [busy]="isLoading" rowSpan="4"></ActivityIndicator>
+        <Button class="btn-primary" row="2" [enabled]="!historyIsLoading" text="Add new score"
+            (tap)="goToScore()"></Button>
+        <ActivityIndicator [busy]="historyIsLoading" rowSpan="4"></ActivityIndicator>
     </GridLayout>
 
 </StackLayout>
