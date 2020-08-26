@@ -18,14 +18,14 @@ export class Score extends Resource {
     public id: string;
     public ownerId: string;
 
-    constructor() {
+    constructor(course?: string, grossScore?: number, scoreDate?: moment.Moment, slope?: number, rating?: number, holes?: number) {
         super();
         this.id = undefined;
-        this.course = "";
-        this.grossScore = null;
-        this.scoreDate = null;
+        this.course = course !== undefined ? course : "";
+        this.grossScore = grossScore !== undefined ? grossScore : null;
+        this.scoreDate = scoreDate !== undefined ? scoreDate : null;
         this.createdAt = moment();
-        this.slope = null;
+        this.slope = slope !== undefined ? slope : null;
         this.rating = null;
         this.conditions = null;
         this.tees = null;

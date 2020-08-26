@@ -12,6 +12,7 @@ import { formatDate } from "../shared/utils/utils";
 import { HandicapService } from "../shared/handicap/handicap.service";
 import { SortMethod, SortOption } from "../shared/utils/utilTypes";
 import * as moment from "moment";
+import { sortScores } from "../shared/score/scoreUtils";
 
 @Component({
     selector: "Home",
@@ -207,8 +208,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.historyIsLoading = true;
         this.scoreSubscription = this.scoreSerivce.list().subscribe(
             (loadedScores) => {
-                this.scores = loadedScores;
-                this.sortScores();
+                this.scores = sortScores(loadedScores, this.selectedSortOption);
                 this.changeDetectorRef.detectChanges();
                 this.historyIsLoading = false;
                 return;
@@ -231,59 +231,9 @@ export class HomeComponent implements OnInit, OnDestroy {
             cancelButtonText: "Cancel",
             actions: this.sortOptions.map((option) => option.label)
         }).then((newOption) => {
-            console.log(newOption);
             if (newOption === "Cancel") return;
             this.selectedSortOption = this.sortOptions.find((option) => option.label === newOption);
-            this.sortScores();
+            this.scores = sortScores(this.scores, this.selectedSortOption);
         })
-    }
-
-    sortScores() {
-        switch (this.selectedSortOption.method) {
-            case SortMethod.DATE_ASC:
-                this.scores = this.scores.sort((a: Score, b: Score) => {
-                    const aDate = moment(a.scoreDate);
-                    const bDate = moment(b.scoreDate);
-                    return aDate.isAfter(bDate, "day")
-                        ? 1
-                        : aDate.isBefore(bDate, "day")
-                            ? -1
-                            : 0;
-                })
-                break;
-            case SortMethod.DATE_DESC:
-                this.scores = this.scores.sort((a: Score, b: Score) => {
-                    const aDate = moment(a.scoreDate);
-                    const bDate = moment(b.scoreDate);
-                    return aDate.isBefore(bDate, "day")
-                        ? 1
-                        : aDate.isAfter(bDate, "day")
-                            ? -1
-                            : 0;
-                })
-                break;
-            case SortMethod.SCORE_ASC:
-                this.scores = this.scores.sort((a: Score, b: Score) => {
-                    return a.grossScore > b.grossScore
-                        ? 1
-                        : a.grossScore < b.grossScore
-                            ? -1
-                            : 0;
-                })
-                break;
-            case SortMethod.SCORE_DESC:
-                this.scores = this.scores.sort((a: Score, b: Score) => {
-                    return a.grossScore < b.grossScore
-                        ? 1
-                        : a.grossScore > b.grossScore
-                            ? -1
-                            : 0;
-                })
-                break;
-            default:
-                break;
-        }
-        console.dir(this.scores.map(score => moment(score.scoreDate).toISOString()));
-        // this.changeDetectorRef.detectChanges();
     }
 }

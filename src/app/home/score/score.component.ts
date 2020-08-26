@@ -18,6 +18,8 @@ export class ScoreComponent implements OnInit {
   public isLoading: boolean = false;
   public savePossible: boolean = false;
 
+  private isFirstLoad: boolean = true;
+
   @ViewChild("scoreForm", null) form: ElementRef;
 
   constructor(private page: Page, private router: RouterExtensions, private activeRoute: ActivatedRoute, public scoreService: ScoreService) { }
@@ -43,7 +45,8 @@ export class ScoreComponent implements OnInit {
             }
             case true: {
               // Save changes
-              this.performSave();
+              this.performSave()
+                .then(() => this.router.backToPreviousPage());
             }
           }
         })
@@ -52,7 +55,13 @@ export class ScoreComponent implements OnInit {
     }
   }
 
-  public setChangesMade = () => this.savePossible = true;
+  public setChangesMade = () => {
+    if (this.isFirstLoad) {
+      this.isFirstLoad = false;
+      return;
+    }
+    this.savePossible = true;
+  };
 
   public notifySaveSuccessful = () => dialogs.alert({
     title: "Save Successful!",
