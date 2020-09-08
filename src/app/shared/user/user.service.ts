@@ -92,7 +92,6 @@ export class UserService {
     })
   }
 
-
   public logout(): Promise<any> {
     return new Promise((resolve, reject) => {
       firebase.logout()
@@ -102,6 +101,19 @@ export class UserService {
         },
           (error: any) => reject(error)
         )
+    })
+  }
+
+  public sendChangePasswordEmail(email: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      console.log(email);
+
+      firebase.sendPasswordResetEmail(email)
+        .then(() => {
+          console.log("Success");
+          resolve();
+        })
+        .catch((error: any) => reject(error));
     })
   }
 }

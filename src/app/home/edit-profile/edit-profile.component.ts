@@ -30,12 +30,15 @@ export class EditProfileComponent implements OnInit {
       })
         .then((option) => {
           switch (option) {
+            // Discard
             case undefined: {
               this.router.backToPreviousPage();
             }
+            // Cancel
             case false: {
               return;
             }
+            // Save
             case true: {
               this.performSave();
             }
@@ -91,10 +94,35 @@ export class EditProfileComponent implements OnInit {
     });
   }
 
+  changePassword() {
+    dialogs.confirm({
+      title: "Change password",
+      message: `Instructions will be sent to ${this.user.email}. Proceed?`,
+      cancelButtonText: "Cancel",
+      okButtonText: "Ok"
+    })
+      .then((option) => {
+        if (!option) return;
+        this.userService.sendChangePasswordEmail(this.user.email)
+          .then(() => dialogs.alert({
+            title: "Success!",
+            message: `Change password instructions sent to ${this.user.email}. Please login with your new password`,
+            okButtonText: "Ok"
+          }).then(() =>
+            this.userService.logout()
+              .then(() => this.router.navigate(["/login"], { clearHistory: true }))
+          ))
+          .catch((error: any) => {
+            console.log(error);
+            this.notifySaveUnsuccessful();
+          });
+      })
+  }
+
   notImplemented() {
     dialogs.alert({
       title: "No implemented",
-      message: "This will do something eventually",
+      message: "This will do something, eventually",
       okButtonText: "Ok"
     });
   }
